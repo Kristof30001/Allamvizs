@@ -1,0 +1,22 @@
+%!TEX root = hems_proj.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Bevezetés és Problémafelvetés}\label{ch:BEVEZETES}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{osszefoglal}
+A fejezet bemutatja a HEMS célját és a keresletoldali szabályozás jelentőségét.
+\end{osszefoglal}
+
+A globális energetikai átalakulás, a decentralizált termelés térnyerése és a fenntarthatósági elvárások a Smart Grid technológiák felé terelik a villamosenergia-hálózatokat. A HEMS kulcsszereplő a lakossági oldalon: kétirányú kommunikációt és energiaáramlást kezel, összehangolja a fogyasztókat, tárolást és megújuló termelést.
+
+\section{A projekt célja}
+A projekt elsődleges célja egy olyan HEMS optimalizálási modell kidolgozása, amely képes a háztartási eszközök összehangolt vezérlésére és a megújuló források optimális kihasználására. A rendszer emellett biztosítja az energiatárolók intelligens irányítását, miközben minimalizálja a villamosenergia-költséget. Fontos szempont továbbá a hálózati terhelési csúcsok csökkentése (PAR redukció) a felhasználói komfort biztosítása mellett.
+
+\section{A keresletoldali szabályozás (DSM) jelentősége}
+A terheléseltolás (Load Shifting) számos előnnyel jár \cite{Fadaee2012}. A legfontosabb a közvetlen, akár 20--40\%-os költségmegtakarítás, de emellett hozzájárul a hálózati csúcsok csökkentéséhez is. Szélesebb körben alkalmazva mérsékli a fosszilis erőművek igénybevételét, ezáltal pedig csökkenti a károsanyag-kibocsátást.
+
+\section{Problémafelvetés és motiváció}
+A HEMS optimalizálás a gyakorlatban több, egymással versengő cél kezelését jelenti: a költség minimalizálását, a felhasználói komfort fenntartását és a hálózati terhelés csökkentését. A lakossági szektorban a fogyasztás időben erősen ingadozó, míg a napelemes termelés időjárásfüggő és bizonytalan. Ezért a feladat nem egyszerű ütemezési probléma, hanem korlátokkal terhelt, vegyes (diszkrét és folytonos) döntési változókat tartalmazó optimalizációs modellként kezelhető \cite{Ismail2014,Fadaee2012}. A téma aktualitását jelzi a megújuló kapacitások növekedése és a dinamikus tarifák terjedése, amelyek a fogyasztói oldalon rugalmas szabályozást tesznek lehetővé. További háttérként lásd az \href{https://energy.ec.europa.eu}{európai energiapolitikai összefoglalót}.
+
+\section{Kutatási célok és hozzájárulások}
+A dolgozat célja egy olyan optimalizációs keret bemutatása, amely természetből inspirált metaheurisztikák (GA, PSO, GWO, hibrid GA--PSO) segítségével csökkenti a napi villamosenergia-költséget, miközben betartja a fizikai és hálózati korlátokat. A megközelítés a szakirodalmi irányokhoz illeszkedik, de a különböző szcenáriókban végzett összehasonlítás révén gyakorlati szempontokat is hangsúlyoz \cite{Lazzari2023}.

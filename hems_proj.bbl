@@ -1,0 +1,47 @@
+\begin{thebibliography}{7}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Fadaee \'es Radzi(2012)]{Fadaee2012}
+Fadaee, M. \'es Radzi, M.
+\newblock Multi-objective optimization of a stand-alone hybrid renewable energy system by using evolutionary algorithms: A review.
+\newblock \emph{Renewable and Sustainable Energy Reviews}, 16\penalty0 (5):\penalty0 3364--3369, 2012.
+\newblock \doi{10.1016/j.rser.2012.02.071}.
+
+\bibitem[Holland(1975)]{HollandGA1975}
+Holland, J.~H.
+\newblock \emph{Adaptation in Natural and Artificial Systems}.
+\newblock University of Michigan Press, 1975.
+
+\bibitem[Ismail et~al.(2014)Ismail, Moghavvemi, \'es Mahlia]{Ismail2014}
+Ismail, M., Moghavvemi, M., \'es Mahlia, T.
+\newblock Genetic algorithm based optimization on modeling and design of hybrid renewable energy systems.
+\newblock \emph{Energy Conversion and Management}, 85:\penalty0 120--130, 2014.
+\newblock \doi{10.1016/j.enconman.2014.05.047}.
+
+\bibitem[Kennedy \'es Eberhart(1995)]{KennedyEberhartPSO1995}
+Kennedy, J. \'es Eberhart, R.
+\newblock Particle swarm optimization.
+\newblock In \emph{Proceedings of ICNN'95}, pages 1942--1948, 1995.
+
+\bibitem[Kumar et~al.(2015)Kumar, Jain, \'es Palwalia]{KumarGA}
+Kumar, P., Jain, G., \'es Palwalia, D.~K.
+\newblock Genetic algorithm based maximum power tracking in solar power generation.
+\newblock \emph{Conference Paper (UCE, Rajasthan Technical University)}, 2015.
+\newblock Source PDF provided.
+
+\bibitem[Lazzari et~al.(2023)Lazzari, Mor, Cipriano, Solsona, Chemisana, \'es Guericke]{Lazzari2023}
+Lazzari, F., Mor, G., Cipriano, J., Solsona, F., Chemisana, D., \'es Guericke, D.
+\newblock Optimizing planning and operation of renewable energy communities with genetic algorithms.
+\newblock \emph{Applied Energy}, 338:\penalty0 120906, 2023.
+\newblock \doi{10.1016/j.apenergy.2023.120906}.
+
+\bibitem[Mirjalili et~al.(2014)Mirjalili, Mirjalili, \'es Lewis]{MirjaliliGWO2014}
+Mirjalili, S., Mirjalili, S.~M., \'es Lewis, A.
+\newblock Grey wolf optimizer.
+\newblock \emph{Advances in Engineering Software}, 69:\penalty0 46--61, 2014.
+
+\end{thebibliography}

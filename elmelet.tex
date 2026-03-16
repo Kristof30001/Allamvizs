@@ -1,0 +1,46 @@
+%!TEX root = hems_proj.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Alkalmazott Algoritmusok}\label{ch:ELM}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{osszefoglal}
+Négy metaheurisztikát és egy hibrid eljárást alkalmaztunk: GA, PSO, GWO és GA-PSO hibrid.
+\end{osszefoglal}
+
+\section{Genetikus Algoritmus (GA)}
+A genetikus algoritmusok alapötletét Holland klasszikus munkája alapozta meg \cite{HollandGA1975}. A módszer fő előnye, hogy jól kezeli a diszkrét változókat és robusztus megoldást nyújt \cite{HollandGA1975}, bár hátránya a lassabb konvergencia. A mérések alapján az algoritmus átlagosan 15--20\%-os költségcsökkenést eredményez.
+
+Az implementált algoritmus működése a következő lépésekből áll. Elsőként generálunk $N$ darab véletlen egyedet, amelyek a kezdeti populációt alkotják, majd minden egyedhez kiszámítjuk a költségfüggvény alapján a fitness értéket. Ezt követi a fő ciklus, amely $G$ generáción keresztül fut. Minden iterációban az elitizmus elve alapján a legjobb két egyed automatikusan továbbjut. A szülőket tournament módszerrel választjuk ki, majd aritmetikai átlagolással és zaj hozzáadásával keresztezzük őket. A sokszínűség fenntartása érdekében Gauss-eloszlású véletlen módosítással mutációt hajtunk végre. Végül az új populáció létrehozása és a határok ellenőrzése után az algoritmus visszatér a legjobb megoldással.
+
+\section{Particle Swarm Optimization (PSO)}
+A PSO eredeti formáját Kennedy és Eberhart vezette be \cite{KennedyEberhartPSO1995}.
+Sebesség-frissítési egyenlet:
+\begin{equation}
+V_i^{k+1} = w \cdot V_i^k + c_1 r_1 (P_{best,i} - X_i^k) + c_2 r_2 (G_{best} - X_i^k)
+\label{eq:pso_velocity}
+\end{equation}
+Pozíció-frissítés:
+\begin{equation}
+X_i^{k+1} = X_i^k + V_i^{k+1}
+\label{eq:pso_position}
+\end{equation}
+Az \eqref{eq:pso_velocity} és \eqref{eq:pso_position} egyenletek adják a PSO alapdinamikáját.
+Előny: gyors, egyszerű. Hátrány: lokális optimumra hajlamos. Teljesítmény: $\approx$ 15--18\% költségcsökkenés.
+
+\section{Grey Wolf Optimizer (GWO)}
+A GWO algoritmust Mirjalili és szerzőtársai javasolták \cite{MirjaliliGWO2014}.
+
+Hierarchikus struktúra: $\alpha$, $\beta$, $\delta$, $\omega$.
+Pozíció-frissítés:
+\begin{align}
+\vec{D}_\alpha &= |\vec{C}_1 \cdot \vec{X}_\alpha - \vec{X}| \\
+\vec{X}_1 &= \vec{X}_\alpha - \vec{A}_1 \cdot \vec{D}_\alpha \\
+\vec{X}(t+1) &= \frac{\vec{X}_1 + \vec{X}_2 + \vec{X}_3}{3}
+\end{align}
+Előny: kevesebb paraméter, jobb exploration-exploitation egyensúly.
+Teljesítmény: $\approx$ 18--20\% költségcsökkenés.
+
+\section{Hibrid GA-PSO}
+A GA és PSO kombinálása ismert hibridizációs irány \cite{KumarGA}.
+
+A hibridizáció logikája a két módszer erősségeit ötvözi: a keresés első fázisában a PSO végzi a gyors feltérképezést a sebesség-frissítési egyenletek segítségével. Ezt követően a GA veszi át az irányítást, amely keresztezéssel és mutációval biztosítja a megoldások diverzifikációját. A két fázis közötti váltás adaptív módon történik, így az algoritmus képes elkerülni a korai konvergenciát, elérve ezzel mintegy 18--22\%-os költségcsökkenést.

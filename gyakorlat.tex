@@ -1,0 +1,92 @@
+%!TEX root = hems_proj.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Kísérleti Eredmények}\label{ch:GYAK}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{osszefoglal}
+Három szcenárióban (tél, nyár, borús) 20-20 futással értékeltük az algoritmusokat; a nyers eredmények CSV/JSON formában mentve vannak.
+\end{osszefoglal}
+
+\section{Kísérleti szcenáriók}
+A kísérleteket három, markánsan eltérő szcenárióban futtattuk le (20-20 alkalommal), hogy a rendszer robusztusságát vizsgáljuk. A \textbf{téli} esetet az alacsony PV termelés és a magasabb alapfogyasztás jellemzi, ami nagy hálózati függést eredményez. A \textbf{nyári} időszakban ezzel szemben magas, csúcsban akár 6 kW-os PV termeléssel és alacsonyabb fogyasztással számolhatunk, ami jelentős visszatáplálási potenciált rejt. Harmadikként egy \textbf{viharos/borús} (cloudy) napot szimuláltunk, ahol az ingadozó PV termelés és a magas zaj miatt az akkumulátor dinamikus kezelése válik szükségessé, ezáltal stressztesztnek vetve alá az algoritmusokat.
+
+A reprodukálhatóság érdekében minden futás determinisztikus bázis-seeddel (42) indul, amelyet a 20 ismétléshez futásonként eltoltunk. A nyers eredményeket és a futási idők listáit CSV/JSON formában mentettük a \texttt{results\_winter}, \texttt{results\_summer} és \texttt{results\_cloudy} fájlokba.
+
+\section{Téli szcenárió eredményei}
+Az alapvonal (akku és időzítés nélkül) télen átlagosan \textbf{42.09 RON}/nap.
+\begin{table}[H]
+\centering
+\caption{Téli szcenárió statisztikái (20 futás, 50/100-as populáció, 150 iteráció, globális seed: 42)}
+\label{tab:winter_stats}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Algoritmus} & \textbf{Átlag költség} & \textbf{Legjobb futás} & \textbf{Átlagos idő (s)} \\
+\midrule
+GA (P=50) & 37.05 & 34.92 & 0.31 \\
+GA (P=100) & 37.25 & 35.06 & 0.62 \\
+PSO & 36.87 & 34.56 & 0.21 \\
+\textbf{GWO} & \textbf{35.40} & 33.91 & 0.44 \\
+Hybrid & 36.28 & \textbf{34.42} & 0.24 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Nyári szcenárió eredményei}
+Az alapvonal (akku és időzítés nélkül) nyáron átlagosan \textbf{12.48 RON}/nap.
+\begin{table}[H]
+\centering
+\caption{Nyári szcenárió statisztikái (20 futás, 50/100-as populáció, 150 iteráció, globális seed: 42)}
+\label{tab:summer_stats}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Algoritmus} & \textbf{Átlag költség} & \textbf{Legjobb futás} & \textbf{Átlagos idő (s)} \\
+\midrule
+GA (P=50) & 4.08 & 3.74 & 0.31 \\
+\textbf{GA (P=100)} & \textbf{3.93} & \textbf{3.64} & 0.62 \\
+PSO & 6.67 & 5.20 & 0.20 \\
+GWO & 5.17 & 4.21 & 0.43 \\
+Hybrid & 5.88 & 4.93 & 0.25 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Viharos/Borús szcenárió eredményei}
+\begin{table}[H]
+\centering
+\caption{Viharos/Borús Nap szcenárió statisztikái (20 futás, 50/100-as populáció, 150 iteráció, globális seed: 42)}
+\label{tab:cloudy_stats}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Algoritmus} & \textbf{Átlag költség} & \textbf{Legjobb futás} & \textbf{Átlagos idő (s)} \\
+\midrule
+GA (P=50) & 14.13 & 13.58 & 0.31 \\
+\textbf{GA (P=100)} & \textbf{13.92} & \textbf{13.60} & 0.61 \\
+PSO & 17.08 & 14.07 & 0.20 \\
+GWO & 15.48 & 14.72 & 0.43 \\
+Hybrid & 16.19 & 14.50 & 0.25 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Eredmények elemzése}
+Az eredmények elemzésekor erős szezonális hatást figyelhetünk meg: nyáron a magas napelem-termelésnek köszönhetően a napi költség drasztikusan, mintegy 67\%-kal csökkenthető (12.48 $\rightarrow$ 3.93 RON), míg télen a megtakarítás mértéke alacsonyabb, körülbelül 18\% (42.09 $\rightarrow$ 34.42 RON). A borús nap a kettő közötti átmenetet képezi. Az algoritmusok teljesítménye is eltérő: a GA (P=100) a komplex, változékony esetekben bizonyult a legrobusztusabbnak, míg a GWO télen, a szűkös erőforrások mellett adta a legjobb átlagot. A PSO gyorsasága ellenére nagy keresési térben hajlamos a beragadásra. A hibrid megoldás kiegyensúlyozott teljesítményt nyújtott, bár a többletidő nem minden esetben eredményezett jobb optimumot. A reprodukálhatóság érdekében minden tesztet 20 ismétléssel, determinisztikus seed használatával végeztünk, a futási idők 0.2 és 0.9 másodperc között alakultak.
+
+\section{Implementációs részletek}
+A hibrid megoldás PSO es GA fazisokra bontja az optimalizalast. A vezerlo logika egy reszlete a \ref{code:hybrid_snippet}. kodreszletben lathato.
+\begin{lstlisting}[language=Python, caption={A hibrid algoritmus vezerlo logikaja}, label=code:hybrid_snippet]
+class Hybrid(AlgorithmBase):
+    def solve(self):
+        # 1. fazis: PSO (felfedezes)
+        pso_steps = int(self.max_iter * 0.6)
+        pso = PSO(self.func, self.dim, self.lb, self.ub,
+                  self.pop_size, pso_steps)
+        gb, gb_fit = pso.solve()
+
+        # 2. fazis: GA (finomhangolas)
+        ga = GA(self.func, self.dim, self.lb, self.ub,
+                self.pop_size, self.max_iter - pso_steps)
+        # ... tovabbi lepesek
+\end{lstlisting}
+
+\section{Ábrák}
+A generált ábrák: \texttt{generated\_day\_*.png}, \texttt{results\_convergence\_*.png}, \texttt{results\_boxplot\_*.png} (winter, summer, cloudy). A konvergencia görbék mutatják a GA lassabb, de stabilabb, és a PSO gyors, de korai stagnálását; a boxplot-ok a 20 futás statisztikai eloszlását ábrázolják.

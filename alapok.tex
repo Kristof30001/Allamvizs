@@ -1,0 +1,40 @@
+%!TEX root = hems_proj.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Irodalmi Attekintes es Fogalmi Alapok}\label{ch:ALAPOK}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{osszefoglal}
+Áttekintjük a HEMS terület fő irányait, valamint bevezetünk néhány alapfogalmat a modell értelmezéséhez.
+\end{osszefoglal}
+
+\section{Irodalmi háttér}
+A HEMS rendszerek optimalizálása tipikusan korlátozott, nemlineáris feladat, amelyben a helyi optimumok és a bizonytalan bemenetek miatt a metaheurisztikus megoldások széles körben elterjedtek \cite{Ismail2014}. A sztochasztikus termelés és a tárolás kezelési nehézségei a rendszer rugalmasságát és korlátkezelést helyezik előtérbe \cite{Fadaee2012}. A gyakorlatban ez azt jelenti, hogy a különböző algoritmusok trade-offokkal dolgoznak: gyorsaság vs. pontosság, illetve átlagos vs. legjobb megoldás.
+
+\section{Definicio: Peak-to-Average Ratio}
+\begin{ert}[Peak-to-Average Ratio -- PAR]
+A PAR ertek a csucsfogyasztas es az atlagfogyasztas hanyadosa, amely a halozati terheles ingadozasat jelzi:
+\begin{equation}
+PAR = \frac{\max\limits_{t \in T} P_{grid}(t)}{\frac{1}{T} \sum\limits_{t=1}^{T} P_{grid}(t)}
+\label{eq:par_def}
+\end{equation}
+Minel alacsonyabb a PAR, annal kiegyensulyozottabb a fogyasztasi profil.
+\end{ert}
+
+\begin{tet}
+Ha $P_{grid}(t) \ge 0$ minden $t \in T$ idopontban, akkor $PAR \ge 1$.
+\end{tet}
+
+\begin{proof}
+A definicio szerint az atlagfogyasztas nem lehet nagyobb, mint a csucsfogyasztas. Ezert
+\(
+\frac{1}{T} \sum_{t=1}^{T} P_{grid}(t) \le \max_{t \in T} P_{grid}(t)
+\), ami alapjan a hanyados legalabb 1.
+\end{proof}
+
+\begin{pld}
+Ha egy adott napon a csucsfogyasztas 4 kW, az atlag pedig 2 kW, akkor $PAR = 2$. Ez egyenetlen terhelest jelez, amelyet terheles-eltolassal csokkenteni lehet.
+\end{pld}
+
+\begin{meg}
+A PAR csokkentese nem csak koltsegcsokkentessel jar, hanem a halozati csucsok merseklesevel is, ami a szolgaltato szamara is elonyos.
+\end{meg}

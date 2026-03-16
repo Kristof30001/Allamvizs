@@ -1,0 +1,15 @@
+%!TEX root = hems_proj.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Fontosabb programkódok listája}\label{ch:progik}
+
+\section{HEMS kódbázis}
+\begin{itemize}
+    \item \texttt{codes/main.py}: szcenáriók futtatása (winter, summer, cloudy), eredmények mentése CSV/JSON-be, ábrák generálása.
+    \item \texttt{codes/algorithms.py}: GA, PSO, GWO és hibrid GA-PSO implementációja.
+    \item \texttt{codes/hems\_problem.py}: SmartHomeEnvironment modell, célfüggvény és korlátkezelés.
+    \item \texttt{codes/data\_generator.py}: fogyasztási, PV és árprofil generálása szezononként.
+\end{itemize}
+
+\section{Mintakódrészlet}
+Az alábbi példa a hibrid algoritmus fő lépéseit illusztrálja:
+\lstinputlisting[language=Python, firstline=62, lastline=116]{ekim2339_proj/codes/algorithms.py}

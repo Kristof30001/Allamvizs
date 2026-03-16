@@ -1,0 +1,32 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{minted}[2026/01/15 v0.1 stub]
+
+% Minimal stub to avoid external minted/pygmentize dependency; redirects to listings
+\DeclareOption*{} % silently ignore all options (e.g., newfloat=true)
+\ProcessOptions\relax
+
+% Load listings only if not already loaded to avoid option clash
+\makeatletter
+\@ifpackageloaded{listings}{}{\RequirePackage{listings}}
+
+% No-op style setters expected by class/templates
+\providecommand{\usemintedstyle}[1]{}
+\providecommand{\setminted}[1]{}
+\providecommand{\minted@checkstyle}[1]{}
+
+% Provide float hooks used by minted's newfloat option
+\providecommand{\fps@listing}{htbp}
+\providecommand{\SetupFloatingEnvironment}[2]{}
+
+% Simple wrappers around listings
+\newenvironment{minted}[2][]{% begin
+  \lstset{language=#2,#1}% keep existing global lstset defaults (encoding, etc.)
+  \begin{lstlisting}%
+}{% end
+  \end{lstlisting}%
+}
+
+\newcommand{\inputminted}[3][]{\lstinputlisting[language=#2,#1]{#3}}
+
+\makeatother
+\endinput

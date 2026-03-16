@@ -1,0 +1,63 @@
+\PassOptionsToPackage{final}{listings}
+\PassOptionsToPackage{table}{xcolor}
+
+\documentclass[final,12pt]{ubb_dolgozat}
+\usepackage{definitions}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{colortbl} 
+
+\graphicspath{{images/}{ekim2339_proj/}}
+
+\submityear{2026}
+\doctypeHU{Projektjelentés}
+\doctypeEN{Project Report}
+\doctypeRO{Raport de proiect}
+
+\titleHU{Intelligens Otthoni Energiarendszerek Optimalizálása Természetből Inspirált Metaheurisztikák Alkalmazásával}
+\titleEN{Optimization of Smart Home Energy Systems with Nature-Inspired Metaheuristics}
+\titleRO{Optimizarea Sistemelor de Energie pentru Locuințe prin Metaheuristici Inspirate din Natură}
+
+\authorHU{Erdei Kristóf-Zoltán}
+\authorEN{Kristóf-Zoltán Erdei}
+\authorRO{Kristóf-Zoltán Erdei}
+
+\tutorHU{Gaskó Noémi}
+\tutorEN{Noémi Gaskó}
+\tutorRO{Noémi Gaskó}
+
+\begin{document}
+
+\pagenumbering{gobble}
+\maketitle
+
+\begin{abstractEN}
+This project report studies the optimization of a Home Energy Management System (HEMS) using nature-inspired metaheuristics. We formulate a cost-minimization scheduling problem with practical constraints (e.g., appliance timing, PV generation uncertainty, and battery operation) and compare four approaches: Genetic Algorithm (GA), Particle Swarm Optimization (PSO), Grey Wolf Optimizer (GWO), and a hybrid GA--PSO method. Experiments are evaluated on multiple seasonal scenarios (winter, summer, and cloudy days) using repeated runs to assess robustness. The results highlight that algorithm choice depends on the operating scenario: exploration-focused methods perform better under uncertainty, while constraint-heavy cases benefit from stronger exploitation. Finally, we summarize implementation recommendations and the expected economic and environmental impact.
+\end{abstractEN}
+
+{ \baselineskip 3ex
+  \parskip 1ex
+  \tableofcontents
+}
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\include{bevezet}
+\include{alapok}
+\include{elmelet}
+\include{gyakorlat}
+\include{elemzes}
+
+\appendix
+\include{programok}
+
+\bibliographystyle{abbrvnat_hu}
+\bibliography{dolgozat}
+
+\end{document}
