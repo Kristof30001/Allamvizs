@@ -1,0 +1,56 @@
+Tökéletes, látom az összes hónapot 2025 januártól 2025 decemberig! A képek alapján pontosan meg tudom mondani melyik napokat töltsd le.
+
+---
+
+## Letöltési lista — konkrét dátumok
+
+### ❄️ Tél
+**Január 2025** (108 kWh hónap)
+- **Jó nap:** jan. 14 (~7 kWh) vagy jan. 29 (~7.5 kWh)
+- **Rossz nap:** jan. 22 (~0.5 kWh) vagy jan. 17 (~0.5 kWh)
+
+**December 2025** (125 kWh hónap)
+- **Jó nap:** dec. 27 (~7.5 kWh) vagy dec. 03 (~7.5 kWh)
+- **Rossz nap:** dec. 24 (~1 kWh)
+
+### 🌸 Tavasz
+**Március 2025** (366 kWh hónap)
+- **Jó nap:** már. 19-21 (~20 kWh)
+- **Rossz nap:** már. 17 (~2.5 kWh) vagy már. 24 (~3 kWh)
+
+**Május 2025** (851 kWh hónap)
+- **Jó nap:** máj. 30 (~46 kWh) vagy máj. 12 (~43 kWh)
+- **Rossz nap:** máj. 23 (~11 kWh) vagy máj. 06 (~17 kWh)
+
+### ☀️ Nyár
+**Június 2025** (1.23 MWh — legjobb hónap!)
+- **Jó nap:** jún. 12 (~47 kWh) vagy jún. 02 (~41 kWh)
+- **Rossz nap:** jún. 28 (~29 kWh) — júniusban alig volt rossz nap!
+
+**Augusztus 2025** (755 kWh hónap)
+- **Jó nap:** aug. 01 (~42 kWh)
+- **Rossz nap:** aug. 22 (~5 kWh) — ez nagyon rossz nyári nap!
+
+### 🍂 Ősz
+**Szeptember 2025** (639 kWh hónap)
+- **Jó nap:** szep. 01-02 (~29 kWh)
+- **Rossz nap:** szep. 25 (~4 kWh)
+
+**November 2025** (181 kWh hónap)
+- **Jó nap:** nov. 02 (~12 kWh) vagy nov. 05 (~12 kWh)
+- **Rossz nap:** nov. 30 (~1 kWh) vagy nov. 10 (~3 kWh)
+
+---
+
+## Prioritási sorrend ha nem akarsz mindent letölteni
+
+| Prioritás | Letöltés | Miért |
+|---|---|---|
+| 🥇 | **Június teljes hónap** | Legjobb nyári adat, 1.23 MWh |
+| 🥇 | **Január teljes hónap** | Legtipikusabb tél |
+| 🥈 | **Augusztus** | Van benne extrém rossz nyári nap (aug 22) |
+| 🥈 | **Szeptember** | Szép őszi adat |
+| 🥉 | **Március 2025** | Tavasz, összehasonlítható a mostani márciussal |
+| 🥉 | **November** | Ősz vége |
+
+Összesen **6 fájl** — ez már teljesen elég a validációhoz minden évszakból!

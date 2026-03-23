@@ -71,7 +71,8 @@ class GA(AlgorithmBase):
             
         return best_sol, best_fit
 
-# --- 2. PSO (unchanged) ---class PSO(AlgorithmBase):
+# --- 2. PSO (unchanged) ---
+class PSO(AlgorithmBase):
     def solve(self):
         w, c1, c2 = 0.6, 1.8, 1.8 
         X = np.random.uniform(self.lb, self.ub, (self.pop_size, self.dim))
