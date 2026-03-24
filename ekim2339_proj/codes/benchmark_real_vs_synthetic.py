@@ -8,6 +8,11 @@ import pandas as pd
 from algorithms import GA, PSO, GWO, Hybrid
 from data_generator import DataGenerator
 from hems_problem import SmartHomeEnvironment
+from price_loader import (
+    build_daily_price_map,
+    find_default_price_csv,
+    load_entsoe_hourly_prices,
+)
 
 
 SELECTED_DAYS = [
@@ -82,8 +87,15 @@ def load_real_hourly_pv(inverter_csv, selected_days):
     return profiles
 
 
-def build_realpv_profiles(real_pv_profiles, gen, load_replicas, seed_base):
+def resolve_day_price(day, day_price_map, default_price):
+    if day in day_price_map:
+        return day_price_map[day].copy()
+    return default_price.copy()
+
+
+def build_realpv_profiles(real_pv_profiles, day_price_map, gen, load_replicas, seed_base):
     profiles = []
+    default_price = gen.get_tou_prices().copy()
     for day in SELECTED_DAYS:
         if day not in real_pv_profiles:
             continue
@@ -100,14 +112,15 @@ def build_realpv_profiles(real_pv_profiles, gen, load_replicas, seed_base):
                     "season": season,
                     "load": load,
                     "pv": meta["pv"].copy(),
-                    "price": gen.get_tou_prices().copy(),
+                    "price": resolve_day_price(day, day_price_map, default_price),
                 }
             )
     return profiles
 
 
-def build_synthetic_profiles(real_pv_profiles, gen, load_replicas, seed_base):
+def build_synthetic_profiles(real_pv_profiles, day_price_map, gen, load_replicas, seed_base):
     profiles = []
+    default_price = gen.get_tou_prices().copy()
     for day in SELECTED_DAYS:
         if day not in real_pv_profiles:
             continue
@@ -124,7 +137,7 @@ def build_synthetic_profiles(real_pv_profiles, gen, load_replicas, seed_base):
                     "season": season,
                     "load": load,
                     "pv": pv,
-                    "price": gen.get_tou_prices().copy(),
+                    "price": resolve_day_price(day, day_price_map, default_price),
                 }
             )
     return profiles
@@ -281,6 +294,7 @@ def to_markdown_report(summary_df, winners_df, raw_df):
 def main():
     repo_root = Path(__file__).resolve().parents[2]
     inverter_csv = repo_root / "Reports" / "Inverter" / "inverter_osszes.csv"
+    price_dir = repo_root / "Reports" / "Price"
     out_dir = repo_root / "ekim2339_proj"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -290,12 +304,31 @@ def main():
     gen = DataGenerator()
     real_pv_map = load_real_hourly_pv(inverter_csv, SELECTED_DAYS)
 
+    day_price_map = {}
+    price_csv = find_default_price_csv(price_dir)
+    if price_csv is not None:
+        try:
+            hourly_prices = load_entsoe_hourly_prices(price_csv)
+            day_price_map = build_daily_price_map(hourly_prices, SELECTED_DAYS)
+            print(f"Valos ENTSO-E arak betoltve: {price_csv.name} | napok: {len(day_price_map)}")
+        except Exception as e:
+            print(f"Figyelem: valos arak betoltese sikertelen ({e}), TOU fallback lesz.")
+    else:
+        print("Figyelem: nincs ENTSO-E ar CSV, TOU fallback lesz.")
+
     missing_days = [d for d in SELECTED_DAYS if d not in real_pv_map]
     if missing_days:
         print("Figyelem, ezekre a napokra nem volt adatsor:", missing_days)
 
-    real_profiles = build_realpv_profiles(real_pv_map, gen, LOAD_REPLICAS, SEED_BASE)
-    synth_profiles = build_synthetic_profiles(real_pv_map, gen, LOAD_REPLICAS, SEED_BASE)
+    real_profiles = build_realpv_profiles(real_pv_map, day_price_map, gen, LOAD_REPLICAS, SEED_BASE)
+    synth_profiles = build_synthetic_profiles(real_pv_map, day_price_map, gen, LOAD_REPLICAS, SEED_BASE)
+
+    if day_price_map:
+        missing_price_days = [d for d in SELECTED_DAYS if d not in day_price_map]
+        if missing_price_days:
+            print("Figyelem: ezekre a napokra TOU fallback ar lesz:", missing_price_days)
+    else:
+        print("Minden profil TOU arat hasznal (valos ar map ures).")
 
     profiles = real_profiles + synth_profiles
     print(f"Profilok szama: {len(profiles)} (real_pv={len(real_profiles)}, synthetic={len(synth_profiles)})")

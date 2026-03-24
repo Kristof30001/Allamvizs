@@ -8,25 +8,25 @@
 
 | Algoritmus | Atlag koltseg | Szoras | Atlag gap % | Gyozelmek | Gyozelmi arany % | Atlag ido (s) |
 |---|---:|---:|---:|---:|---:|---:|
-| GA (P=100) | 26.82 | 21.32 | 3.77 | 6 | 37.5 | 0.202 |
-| GA (P=50) | 27.16 | 20.78 | 12.38 | 1 | 6.2 | 0.102 |
-| GWO | 25.65 | 19.49 | 16.20 | 9 | 56.2 | 0.150 |
-| Hybrid | 28.30 | 20.07 | 31.21 | 0 | 0.0 | 0.085 |
-| PSO | 30.03 | 19.86 | 53.31 | 0 | 0.0 | 0.068 |
+| GA (P=100) | 13.61 | 11.59 | 0.96 | 10 | 62.5 | 0.156 |
+| GA (P=50) | 13.90 | 11.43 | 32.08 | 3 | 18.8 | 0.079 |
+| GWO | 14.23 | 11.12 | 60.65 | 3 | 18.8 | 0.119 |
+| Hybrid | 15.43 | 11.52 | 82.20 | 0 | 0.0 | 0.066 |
+| PSO | 16.70 | 10.88 | 159.08 | 0 | 0.0 | 0.055 |
 
 ## synthetic
 
 | Algoritmus | Atlag koltseg | Szoras | Atlag gap % | Gyozelmek | Gyozelmi arany % | Atlag ido (s) |
 |---|---:|---:|---:|---:|---:|---:|
-| GA (P=100) | 16.79 | 12.12 | 3.34 | 10 | 62.5 | 0.209 |
-| GA (P=50) | 17.33 | 11.91 | 8.14 | 4 | 25.0 | 0.106 |
-| GWO | 17.99 | 11.45 | 15.56 | 2 | 12.5 | 0.154 |
-| Hybrid | 20.20 | 12.04 | 31.55 | 0 | 0.0 | 0.084 |
-| PSO | 21.08 | 11.46 | 42.84 | 0 | 0.0 | 0.068 |
+| GA (P=100) | 10.47 | 7.11 | 0.91 | 12 | 75.0 | 0.159 |
+| GA (P=50) | 10.84 | 7.13 | 4.25 | 3 | 18.8 | 0.080 |
+| GWO | 11.62 | 7.51 | 10.80 | 1 | 6.2 | 0.120 |
+| Hybrid | 12.98 | 7.00 | 28.15 | 0 | 0.0 | 0.067 |
+| PSO | 13.52 | 7.15 | 33.21 | 0 | 0.0 | 0.056 |
 
 ## Konkluzio
 
-A valos PV adatokon a legstabilabb algoritmus: GA (P=100) (atlag gap: 3.77%, gyozelmi arany: 37.5%).
-A teljesen szintetikus adatokon a legstabilabb algoritmus: GA (P=100) (atlag gap: 3.34%, gyozelmi arany: 62.5%).
+A valos PV adatokon a legstabilabb algoritmus: GA (P=100) (atlag gap: 0.96%, gyozelmi arany: 62.5%).
+A teljesen szintetikus adatokon a legstabilabb algoritmus: GA (P=100) (atlag gap: 0.91%, gyozelmi arany: 75.0%).
 A ket adathalmazon ugyanaz a nyertes, ami jo generalizaciot jelez.
 A kiertékeles osszesen 320 egyedi algoritmusfutast tartalmaz.
