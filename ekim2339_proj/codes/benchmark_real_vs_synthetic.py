@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from algorithms import GA, PSO, GWO, Hybrid
 from data_generator import DataGenerator
@@ -291,12 +292,216 @@ def to_markdown_report(summary_df, winners_df, raw_df):
     return "\n".join(lines)
 
 
+def prepare_output_dirs(base_dir):
+    output_root = base_dir / "outputs"
+    tables_dir = output_root / "tables"
+    reports_dir = output_root / "reports"
+    plots_days_dir = output_root / "plots" / "days"
+    plots_summary_dir = output_root / "plots" / "summary"
+
+    for p in [tables_dir, reports_dir, plots_days_dir, plots_summary_dir]:
+        p.mkdir(parents=True, exist_ok=True)
+
+    return {
+        "output_root": output_root,
+        "tables": tables_dir,
+        "reports": reports_dir,
+        "plots_days": plots_days_dir,
+        "plots_summary": plots_summary_dir,
+    }
+
+
+def build_real_day_load_map(real_profiles):
+    day_load_map = {}
+    for p in real_profiles:
+        day = p.get("day")
+        if day not in day_load_map:
+            day_load_map[day] = np.asarray(p["load"], dtype=float)
+    return day_load_map
+
+
+def _upsample_hourly(values, factor=4):
+    base_x = np.arange(len(values), dtype=float)
+    dense_x = np.linspace(0.0, len(values) - 1, len(values) * factor)
+    dense_y = np.interp(dense_x, base_x, values)
+    return dense_x, dense_y
+
+
+def plot_daily_realpv_price(real_pv_map, day_price_map, day_load_map, out_dir):
+    generated = 0
+    for day, meta in real_pv_map.items():
+        if day not in day_price_map or day not in day_load_map:
+            continue
+
+        hours = np.arange(24)
+        pv = np.asarray(meta["pv"], dtype=float)
+        load = np.asarray(day_load_map[day], dtype=float)
+        price = np.asarray(day_price_map[day], dtype=float)
+        if pv.shape != (24,) or load.shape != (24,) or price.shape != (24,):
+            continue
+        net = load - pv
+
+        h_fine, pv_fine = _upsample_hourly(pv, factor=4)
+        _, load_fine = _upsample_hourly(load, factor=4)
+        _, net_fine = _upsample_hourly(net, factor=4)
+        _, price_fine = _upsample_hourly(price, factor=4)
+
+        fig, ax1 = plt.subplots(figsize=(10, 4.8))
+        ax1.plot(h_fine, pv_fine, color="#1f77b4", linewidth=2.0, label="PV (kW)")
+        ax1.plot(h_fine, load_fine, color="#2ca02c", linewidth=2.0, label="Load (kW)")
+        ax1.plot(h_fine, net_fine, color="#9467bd", linewidth=1.8, linestyle="-.", label="Net (Load-PV) (kW)")
+        ax1.scatter(hours, pv, color="#1f77b4", s=14, alpha=0.8)
+        ax1.scatter(hours, load, color="#2ca02c", s=14, alpha=0.8)
+        ax1.set_xlabel("Ora")
+        ax1.set_ylabel("Teljesitmeny (kW)")
+        ax1.set_xticks(np.arange(0, 24, 1))
+        ax1.grid(True, alpha=0.25)
+
+        ax2 = ax1.twinx()
+        ax2.plot(h_fine, price_fine, color="#d62728", linewidth=2.0, linestyle="--", label="Ar (RON/kWh)")
+        ax2.scatter(hours, price, color="#d62728", s=12, alpha=0.8)
+        ax2.set_ylabel("Ar (RON/kWh)", color="#d62728")
+        ax2.tick_params(axis="y", labelcolor="#d62728")
+
+        lines1, labels1 = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper left")
+
+        plt.title(f"{day} - Valos PV, load, netto gorbe es villamosenergia-ar")
+        plt.tight_layout()
+        fig.savefig(out_dir / f"{day}_realpv_price.png", dpi=150)
+        plt.close(fig)
+        generated += 1
+
+    return generated
+
+
+def _plot_metric_bar(summary_df, dataset, metric_col, ylabel, title, out_path):
+    sub = summary_df[summary_df["dataset"] == dataset].copy()
+    if sub.empty:
+        return False
+
+    sub = sub.sort_values(metric_col, ascending=True)
+    fig, ax = plt.subplots(figsize=(8, 4.8))
+    ax.barh(sub["algorithm"], sub[metric_col], color="#4e79a7")
+    ax.set_xlabel(ylabel)
+    ax.set_title(title)
+    ax.grid(True, axis="x", alpha=0.2)
+    plt.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+    return True
+
+
+def _plot_cost_runs_scatter(raw_df, dataset, out_path):
+    sub = raw_df[raw_df["dataset"] == dataset].copy()
+    if sub.empty:
+        return False
+
+    algos = list(ALGORITHMS.keys())
+    fig, ax = plt.subplots(figsize=(9.5, 5.0))
+
+    rng = np.random.default_rng(42)
+    for idx, algo in enumerate(algos):
+        a = sub[sub["algorithm"] == algo]
+        if a.empty:
+            continue
+        x = idx + rng.uniform(-0.15, 0.15, size=len(a))
+        ax.scatter(x, a["cost"], s=20, alpha=0.45, label=algo)
+        ax.scatter([idx], [a["cost"].mean()], s=80, marker="D", color="black", zorder=5)
+
+    ax.set_xticks(range(len(algos)))
+    ax.set_xticklabels(algos, rotation=15)
+    ax.set_ylabel("Cost")
+    ax.set_title(f"{dataset} - Run szintu cost pontfelho (fekete: atlag)")
+    ax.grid(True, axis="y", alpha=0.25)
+    ax.legend(loc="best", fontsize=8)
+    plt.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+    return True
+
+
+def _plot_daily_best_cost_lines(raw_df, dataset, out_path):
+    sub = raw_df[raw_df["dataset"] == dataset].copy()
+    if sub.empty:
+        return False
+
+    best = (
+        sub.groupby(["day", "algorithm"], as_index=False)["cost"]
+        .min()
+    )
+    pivot = best.pivot(index="day", columns="algorithm", values="cost").sort_index()
+    if pivot.empty:
+        return False
+
+    x = np.arange(len(pivot.index))
+    fig, ax = plt.subplots(figsize=(10.2, 5.0))
+    for algo in ALGORITHMS.keys():
+        if algo not in pivot.columns:
+            continue
+        y = pivot[algo].to_numpy(dtype=float)
+        ax.plot(x, y, marker="o", linewidth=1.8, markersize=4, label=algo)
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(pivot.index, rotation=45, ha="right")
+    ax.set_ylabel("Napi legjobb cost")
+    ax.set_title(f"{dataset} - Napi legjobb cost algoritmusonkent")
+    ax.grid(True, axis="y", alpha=0.25)
+    ax.legend(loc="best", fontsize=8)
+    plt.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+    return True
+
+
+def plot_summary_charts(summary_df, raw_df, out_dir):
+    generated = 0
+    for dataset in ["real_pv", "synthetic"]:
+        ok1 = _plot_metric_bar(
+            summary_df,
+            dataset,
+            "mean_cost",
+            "Atlag koltseg",
+            f"{dataset} - Atlag koltseg algoritmusonkent",
+            out_dir / f"{dataset}_mean_cost.png",
+        )
+        ok2 = _plot_metric_bar(
+            summary_df,
+            dataset,
+            "avg_gap_pct",
+            "Atlag gap (%)",
+            f"{dataset} - Atlag gap algoritmusonkent",
+            out_dir / f"{dataset}_avg_gap_pct.png",
+        )
+        ok3 = _plot_metric_bar(
+            summary_df,
+            dataset,
+            "mean_runtime_s",
+            "Atlag futasi ido (s)",
+            f"{dataset} - Atlag futasi ido algoritmusonkent",
+            out_dir / f"{dataset}_mean_runtime_s.png",
+        )
+        ok4 = _plot_cost_runs_scatter(
+            raw_df,
+            dataset,
+            out_dir / f"{dataset}_cost_scatter_runs.png",
+        )
+        ok5 = _plot_daily_best_cost_lines(
+            raw_df,
+            dataset,
+            out_dir / f"{dataset}_daily_best_cost_lines.png",
+        )
+        generated += int(ok1) + int(ok2) + int(ok3) + int(ok4) + int(ok5)
+    return generated
+
+
 def main():
     repo_root = Path(__file__).resolve().parents[2]
     inverter_csv = repo_root / "Reports" / "Inverter" / "inverter_osszes.csv"
     price_dir = repo_root / "Reports" / "Price"
-    out_dir = repo_root / "ekim2339_proj"
-    out_dir.mkdir(parents=True, exist_ok=True)
+    project_dir = repo_root / "ekim2339_proj"
+    dirs = prepare_output_dirs(project_dir)
 
     if not inverter_csv.exists():
         raise FileNotFoundError(f"Nem talalhato: {inverter_csv}")
@@ -336,12 +541,12 @@ def main():
     raw_df = evaluate_profiles(profiles, RUNS_PER_PROFILE, SEED_BASE)
     summary_df, gaps_df, winners_df = build_summary(raw_df)
 
-    raw_path = out_dir / "results_realpv_vs_synth_raw.csv"
-    summary_path = out_dir / "results_realpv_vs_synth_summary.csv"
-    gaps_path = out_dir / "results_realpv_vs_synth_gaps.csv"
-    winners_path = out_dir / "results_realpv_vs_synth_winners.csv"
-    report_path = out_dir / "results_realpv_vs_synth_report.md"
-    json_path = out_dir / "results_realpv_vs_synth_summary.json"
+    raw_path = dirs["tables"] / "results_realpv_vs_synth_raw.csv"
+    summary_path = dirs["tables"] / "results_realpv_vs_synth_summary.csv"
+    gaps_path = dirs["tables"] / "results_realpv_vs_synth_gaps.csv"
+    winners_path = dirs["tables"] / "results_realpv_vs_synth_winners.csv"
+    report_path = dirs["reports"] / "results_realpv_vs_synth_report.md"
+    json_path = dirs["tables"] / "results_realpv_vs_synth_summary.json"
 
     raw_df.to_csv(raw_path, index=False)
     summary_df.to_csv(summary_path, index=False)
@@ -354,12 +559,18 @@ def main():
     report_text = to_markdown_report(summary_df, winners_df, raw_df)
     report_path.write_text(report_text, encoding="utf-8")
 
+    day_load_map = build_real_day_load_map(real_profiles)
+    daily_plot_count = plot_daily_realpv_price(real_pv_map, day_price_map, day_load_map, dirs["plots_days"])
+    summary_plot_count = plot_summary_charts(summary_df, raw_df, dirs["plots_summary"])
+
     print(f"Mentve: {raw_path}")
     print(f"Mentve: {summary_path}")
     print(f"Mentve: {gaps_path}")
     print(f"Mentve: {winners_path}")
     print(f"Mentve: {json_path}")
     print(f"Mentve: {report_path}")
+    print(f"Mentve napi PNG-k: {daily_plot_count} -> {dirs['plots_days']}")
+    print(f"Mentve summary PNG-k: {summary_plot_count} -> {dirs['plots_summary']}")
 
 
 if __name__ == "__main__":

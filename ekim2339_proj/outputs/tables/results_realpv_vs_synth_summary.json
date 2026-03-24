@@ -1,0 +1,112 @@
+[
+  {
+    "dataset": "real_pv",
+    "algorithm": "GA (P=100)",
+    "mean_cost": 13.608843426861254,
+    "std_cost": 11.585460004339438,
+    "best_cost": 0.24921465215171423,
+    "mean_runtime_s": 0.1801338717341423,
+    "avg_gap_pct": 0.9648411185438998,
+    "wins": 10,
+    "win_rate_pct": 62.5
+  },
+  {
+    "dataset": "real_pv",
+    "algorithm": "GA (P=50)",
+    "mean_cost": 13.902049360459182,
+    "std_cost": 11.434379691138718,
+    "best_cost": 0.9642890116719629,
+    "mean_runtime_s": 0.09245970100164413,
+    "avg_gap_pct": 32.084563641028964,
+    "wins": 3,
+    "win_rate_pct": 18.75
+  },
+  {
+    "dataset": "real_pv",
+    "algorithm": "GWO",
+    "mean_cost": 14.22696768652845,
+    "std_cost": 11.123392385245253,
+    "best_cost": 1.5091516611219256,
+    "mean_runtime_s": 0.13405796140432358,
+    "avg_gap_pct": 60.64699862958439,
+    "wins": 3,
+    "win_rate_pct": 18.75
+  },
+  {
+    "dataset": "real_pv",
+    "algorithm": "Hybrid",
+    "mean_cost": 15.432673248246896,
+    "std_cost": 11.522771617293932,
+    "best_cost": 2.0376082521294654,
+    "mean_runtime_s": 0.074083112180233,
+    "avg_gap_pct": 82.19535423061987,
+    "wins": 0,
+    "win_rate_pct": 0.0
+  },
+  {
+    "dataset": "real_pv",
+    "algorithm": "PSO",
+    "mean_cost": 16.703751432517517,
+    "std_cost": 10.883075220846234,
+    "best_cost": 2.5029074552340087,
+    "mean_runtime_s": 0.06273951381444931,
+    "avg_gap_pct": 159.08342289714525,
+    "wins": 0,
+    "win_rate_pct": 0.0
+  },
+  {
+    "dataset": "synthetic",
+    "algorithm": "GA (P=100)",
+    "mean_cost": 10.465185316619742,
+    "std_cost": 7.111904787907332,
+    "best_cost": 4.033786641120499,
+    "mean_runtime_s": 0.166920468211174,
+    "avg_gap_pct": 0.9135964563198207,
+    "wins": 12,
+    "win_rate_pct": 75.0
+  },
+  {
+    "dataset": "synthetic",
+    "algorithm": "GA (P=50)",
+    "mean_cost": 10.836596686142325,
+    "std_cost": 7.129344841168684,
+    "best_cost": 4.372659416589381,
+    "mean_runtime_s": 0.08472596853971481,
+    "avg_gap_pct": 4.245462696168248,
+    "wins": 3,
+    "win_rate_pct": 18.75
+  },
+  {
+    "dataset": "synthetic",
+    "algorithm": "GWO",
+    "mean_cost": 11.615543047010517,
+    "std_cost": 7.512591987743938,
+    "best_cost": 4.825108127783585,
+    "mean_runtime_s": 0.12800374627113342,
+    "avg_gap_pct": 10.797333335102737,
+    "wins": 1,
+    "win_rate_pct": 6.25
+  },
+  {
+    "dataset": "synthetic",
+    "algorithm": "Hybrid",
+    "mean_cost": 12.977584818327538,
+    "std_cost": 7.0043438022771545,
+    "best_cost": 6.100118432156742,
+    "mean_runtime_s": 0.07111001759767532,
+    "avg_gap_pct": 28.145898689305213,
+    "wins": 0,
+    "win_rate_pct": 0.0
+  },
+  {
+    "dataset": "synthetic",
+    "algorithm": "PSO",
+    "mean_cost": 13.523680895428704,
+    "std_cost": 7.154006128708648,
+    "best_cost": 5.708554392001874,
+    "mean_runtime_s": 0.0590139776468277,
+    "avg_gap_pct": 33.20965964422012,
+    "wins": 0,
+    "win_rate_pct": 0.0
+  }
+]
