@@ -1,0 +1,70 @@
+%!TEX root = hems_proj_modositott.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{A projekt módosított változatának jelenlegi állapota}\label{ch:FRISSITES}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{osszefoglal}
+Ez a fejezet az eredeti dolgozatot kiegészítve összefoglalja a módosított projektverzió fő újdonságait: a valós árintegrációt, az új output-struktúrát, a bővített vizualizációkat és a jelenlegi benchmark-beállításokat.
+\end{osszefoglal}
+
+\section{Mi változott az eredeti projekthez képest}
+A módosított verzió az alap kutatási kérdést nem változtatja meg: továbbra is természetből inspirált algoritmusokat hasonlítunk össze HEMS optimalizálási feladaton. A különbség a bemenetek és a riportolás realitásában jelentkezik:
+\begin{itemize}
+  \item valós inverteres PV idősor használata napokra bontva,
+  \item valós ENTSO-E day-ahead árak beépítése (RO zóna, órás felbontás),
+  \item rendezett kimeneti mappastruktúra,
+  \item részletesebb napi és összegző PNG ábrák.
+\end{itemize}
+
+\section{Új bemenetek és adatfolyam}
+A benchmark futásban kiválasztott napok száma 16. A valós PV profilok az inverter-adatokból származnak, az árprofilok pedig ENTSO-E CSV forrásból kerülnek feldolgozásra. A futtatás során a rendszer minden naphoz 24 elemű órás vektort használ (load, PV, price). A jelenlegi konfigurációban:
+\begin{itemize}
+  \item \texttt{LOAD\_REPLICAS = 1},
+  \item \texttt{RUNS\_PER\_PROFILE = 2},
+  \item 5 algoritmus kerül kiértékelésre (GA(P=50), GA(P=100), PSO, GWO, Hybrid).
+\end{itemize}
+
+\section{Kimeneti struktúra}
+A korábbi ``ömlesztett'' mentés helyett a projekt kimenetei rendezett formában készülnek:
+\begin{itemize}
+  \item \texttt{ekim2339\_proj/outputs/tables}: nyers és aggregált CSV/JSON eredmények,
+  \item \texttt{ekim2339\_proj/outputs/reports}: markdown riport,
+  \item \texttt{ekim2339\_proj/outputs/plots/days}: napi PV/load/net/ár ábrák,
+  \item \texttt{ekim2339\_proj/outputs/plots/summary}: összegző ábrák (cost, gap, runtime, scatter, napi trend).
+\end{itemize}
+
+\section{Példa ábrák a módosított futásból}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{outputs/plots/days/2025-06-12_realpv_price.png}
+\caption{Napi részletes ábra: valós PV, generált fogyasztás, nettó terhelés és valós órás árprofil}
+\label{fig:updated_day_plot}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{outputs/plots/summary/real_pv_mean_cost.png}
+\caption{Összegző ábra: átlagos költség algoritmusonként (real\_pv dataset)}
+\label{fig:updated_summary_cost}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{outputs/plots/summary/real_pv_cost_scatter_runs.png}
+\caption{Run-szintű pontfelhő: költségeloszlás algoritmusonként (real\_pv)}
+\label{fig:updated_scatter}
+\end{figure}
+
+\section{Aktuális eredménykép és értelmezés}
+A módosított pipeline jelenlegi futása szerint mindkét dataseten a GA(P=100) adta a legstabilabb összképet átlagos eltérés (gap) alapján. Ugyanakkor napfüggően továbbra is előfordul, hogy más algoritmus nyer egyes profilokon. Ez megerősíti, hogy a probléma továbbra is szcenárió-érzékeny, tehát egyetlen algoritmus abszolút dominanciája nem feltételezhető minden körülmény között.
+
+\section{Következő fejlesztési lépések}
+A projekt következő mérnöki és kutatási lépései:
+\begin{enumerate}
+  \item külön vételi/eladási ármodell bevezetése,
+  \item akkumulátor degradációs költség expliciten beépítése a célfüggvénybe,
+  \item opcionálisan több fogyasztási profil-változat (replika) ugyanarra a napra a robusztusság növeléséhez,
+  \item érzékenységvizsgálat különböző degradációs és árparaméterekre.
+\end{enumerate}
+
+A fenti bővítések az eredeti dolgozat irányát megtartják, de a gyakorlati alkalmazhatóságot és a riportolhatóságot jelentősen erősítik.
