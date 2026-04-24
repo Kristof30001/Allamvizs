@@ -1,0 +1,76 @@
+%!TEX root = hems_proj.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Reprodukálhatóság és Érvényességi Korlátok}\label{ch:REPRO}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{osszefoglal}
+A fejezet célja a projekt tudományos megbízhatóságának dokumentálása: hogyan reprodukálhatók a futások, mely tényezők torzíthatják az eredményeket, és milyen bővítések szükségesek a külső validitás növeléséhez.
+\end{osszefoglal}
+
+\section{Reprodukálhatósági alapelvek}
+A jelenlegi benchmark reprodukálhatóságát három technikai elv biztosítja:
+\begin{enumerate}
+  \item determinisztikus seedelési séma,
+  \item fixen deklarált naplista és algoritmuskészlet,
+  \item strukturált output mentés nyers és aggregált szinteken.
+\end{enumerate}
+
+A seedelés profile-, algorithm- és run-szinten eltolt, így egyszerre támogatja a megismételhetőséget és a kontrollált variabilitást.
+
+\section{Futási környezet és artefaktok}
+A projekt kimeneteit célszerű három szinten kezelni:
+\begin{itemize}
+  \item \textbf{Nyers szint}: minden futás külön sorban (költség, futásidő);
+  \item \textbf{Aggregált szint}: algoritmusonkénti átlag/szórás/gap/győzelem;
+  \item \textbf{Narratív szint}: markdown report és dolgozati ábrák.
+\end{itemize}
+
+Ezzel biztosítható, hogy a dolgozat szöveges állításai közvetlenül ellenőrizhetők legyenek táblázatos formában.
+
+\section{Belső érvényesség (internal validity)}
+A belső érvényességet főként az alábbi tényezők befolyásolják:
+\begin{itemize}
+  \item algoritmusparaméterek (populációméret, iterációszám),
+  \item futások száma profilonként,
+  \item seed-függő sztochasztikus szórás,
+  \item korlátbüntetések súlyozása a célfüggvényben.
+\end{itemize}
+
+A jelen konfiguráció gyors összehasonlítást céloz, ezért az eredmények rangsor-jellegű értelmezése megbízhatóbb, mint a finom abszolút különbségek túlinterpretálása.
+
+\section{Külső érvényesség (external validity)}
+A külső validitás jelenleg közepes erősségű, mivel:
+\begin{itemize}
+  \item a PV adatok valósak,
+  \item az árprofilok valós ENTSO-E forrásból származnak,
+  \item ugyanakkor a load profil döntően generált.
+\end{itemize}
+
+A gyakorlati általánosíthatóság javításához szükséges:
+\begin{enumerate}
+  \item mért háztartási load-idősorok bevonása,
+  \item több háztartás- és eszközkonfiguráció vizsgálata,
+  \item hosszabb időhorizontú (szezonális/éves) validáció.
+\end{enumerate}
+
+\section{Fenyegetések az érvényességre (threats to validity)}
+\subsection{Adatminőségi kockázatok}
+Időbélyeg-inkonzisztencia, hiányos órák, forrásoldali formátumváltás mind torzíthatják a napi profilképzést. A fallback logika csökkenti a futásmegszakadás esélyét, de elemzési torzítást okozhat, ha túl gyakran aktiválódik.
+
+\subsection{Modellezési egyszerűsítések}
+A jelen célfüggvény még nem tartalmaz explicit akkumulátor-degradációs költséget, és a visszatáplálási ár egyszerűsített szorzóval modellezett. Ezek érdemi közelítések, de korlátozzák a gazdasági becslések pontosságát.
+
+\subsection{Algoritmikus torzítások}
+Kis futásszám mellett egy-egy szerencsés/unlucky seed túlreprezentálódhat. Ezért a jövőbeli, végleges összehasonlításban a futásszám növelése és bootstrap-alapú konfidencia-intervallumok alkalmazása ajánlott.
+
+\section{Javasolt validációs protokoll a következő iterációra}
+A következő fejlesztési körben célszerű standardizált validációs protokollt használni:
+\begin{enumerate}
+  \item baseline definíció (akku és ütemezés nélkül),
+  \item fix train/validation naplista,
+  \item legalább 10--20 futás algoritmus/profil szinten,
+  \item összesített statisztika konfidencia-intervallummal,
+  \item érzékenységvizsgálat (ár, degradáció, eszközparaméterek).
+\end{enumerate}
+
+E protokoll alkalmazásával a dolgozat eredményei nemcsak reprodukálhatók, hanem erősebb tudományos alátámasztást is kapnak.

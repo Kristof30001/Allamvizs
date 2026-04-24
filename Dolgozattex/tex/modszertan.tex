@@ -1,0 +1,79 @@
+%!TEX root = hems_proj.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Módszertan és Rendszerarchitektúra}\label{ch:MODSZERTAN}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{osszefoglal}
+Ez a fejezet a projekt jelenlegi implementációs állapotának megfelelően formalizálja a teljes pipeline-t: adatforrások, profilépítés, optimalizálási ciklus, és riportolási lépések. A cél, hogy az eredmények ne csak reprodukálhatók, hanem módszertanilag auditálhatók is legyenek.
+\end{osszefoglal}
+
+\section{Rendszerblokkok és felelősségek}
+A megoldás moduláris felépítésű, az egyes komponensek egyértelmű felelősségi határokkal működnek:
+\begin{itemize}
+  \item \texttt{hems\_problem.py}: döntési tér, célfüggvény, korlátkezelés;
+  \item \texttt{algorithms.py}: GA, PSO, GWO, Hybrid optimalizálók;
+  \item \texttt{data\_generator.py}: szintetikus load/PV profilok, CSV validáció;
+  \item \texttt{price\_loader.py}: ENTSO-E árak betöltése és napi árprofil-képzés;
+  \item \texttt{benchmark\_real\_vs\_synthetic.py}: teljes benchmark-vezérlés, aggregáció, riportolás.
+\end{itemize}
+
+A moduláris szerkezet célja, hogy egy-egy részegység (például árkezelés vagy célfüggvény) változtatása minimális oldalkövetkezménnyel járjon.
+
+\section{Adatforrások és előfeldolgozás}
+A benchmark két fő külső adatkört használ:
+\begin{enumerate}
+  \item inverteres teljesítmény-idősorok (5 perces mintavételből órás átlag),
+  \item ENTSO-E day-ahead árak (EUR/MWh), amelyek RON/kWh formára konvertálódnak.
+\end{enumerate}
+
+Az áradatok feldolgozása során területi szűrés (RO zóna), időbélyeg-normalizálás és órás újramintavételezés történik. Hiányos napi árprofil esetén fallback TOU ár kerül használatra. Ez biztosítja, hogy részlegesen hiányos forrás mellett is végigfutható maradjon a pipeline.
+
+\section{Profilépítés: real\_pv és synthetic}
+A benchmark minden kiválasztott napra két profilcsaládot képez:
+\begin{itemize}
+  \item \texttt{real\_pv}: valós PV + generált load + valós/fallback ár,
+  \item \texttt{synthetic}: generált PV + generált load + valós/fallback ár.
+\end{itemize}
+
+A döntés mögötti módszertani cél: a bemeneti realizmus hatásának elkülönítése a solver-teljesítménytől. Így az összehasonlítás nem csupán algoritmusok között történik, hanem adathűségi szintek között is.
+
+\section{Optimalizálási ciklus és futásszám}
+Jelölje $D$ a napok számát, $S$ a dataset-változatok számát, $R$ a replikák számát, $A$ az algoritmusok számát, $K$ pedig a futások számát. Ekkor a teljes futásszám:
+\begin{equation}
+N_{eval} = D \cdot S \cdot R \cdot A \cdot K
+\end{equation}
+
+A jelenlegi konfigurációban $D=16$, $S=2$, $R=1$, $A=5$, $K=2$, ezért:
+\begin{equation}
+N_{eval}=320
+\end{equation}
+
+Minden futás során az algoritmus azonos problémaformulációt old meg, de a seedelés kontrolláltan változik profile/algorithm/run szinten.
+
+\section{Kiértékelési mutatók}
+A nyers futásszintű adatokból aggregált mutatók képződnek:
+\begin{itemize}
+  \item átlagköltség ($mean\_cost$),
+  \item költségszórás ($std\_cost$),
+  \item legjobb költség ($best\_cost$),
+  \item átlag futási idő ($mean\_runtime\_s$),
+  \item átlagos relatív rés a profilonkénti legjobbhoz képest ($avg\_gap\_pct$),
+  \item győzelmek száma és aránya ($wins$, $win\_rate\_pct$).
+\end{itemize}
+
+A gap egy profile-szintű normalizált mutató:
+\begin{equation}
+gap_{i,a}[\%] = \frac{c^{best}_{i,a} - c^{best}_{i,*}}{|c^{best}_{i,*}|+\varepsilon} \cdot 100
+\end{equation}
+ahol $c^{best}_{i,*}$ az adott profil globális legjobb költsége.
+
+\section{Artefakt-alapú riportolás}
+A rendszer strukturált kimenetet állít elő:
+\begin{itemize}
+  \item \texttt{outputs/tables}: nyers és aggregált CSV/JSON,
+  \item \texttt{outputs/reports}: markdown összegzés,
+  \item \texttt{outputs/plots/days}: napi kombinált PV/load/net/ár ábrák,
+  \item \texttt{outputs/plots/summary}: összevont metrikaábrák.
+\end{itemize}
+
+Ez az elrendezés támogatja a dolgozatban szereplő állítások visszakövethetőségét: minden összegző tábla és ábra visszavezethető nyers futásszintű adatra.

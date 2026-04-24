@@ -44,3 +44,35 @@ Teljesítmény: $\approx$ 18--20\% költségcsökkenés.
 A GA és PSO kombinálása ismert hibridizációs irány \cite{KumarGA}.
 
 A hibridizáció logikája a két módszer erősségeit ötvözi: a keresés első fázisában a PSO végzi a gyors feltérképezést a sebesség-frissítési egyenletek segítségével. Ezt követően a GA veszi át az irányítást, amely keresztezéssel és mutációval biztosítja a megoldások diverzifikációját. A két fázis közötti váltás adaptív módon történik, így az algoritmus képes elkerülni a korai konvergenciát, elérve ezzel mintegy 18--22\%-os költségcsökkenést.
+
+\section{Komplexitás és paraméterérzékenység}
+A vizsgált algoritmusok mindegyike populációalapú keresést végez, ezért a végrehajtási idő első közelítésben a populációméret ($N$), az iterációszám ($G$) és a döntési dimenzió ($d$) szorzatával arányos. A projekt jelenlegi problémájában $d=26$: 24 akkumulátorvezérlési változó és 2 eszközindítási idő szerepel a döntési vektorban. Így egy futás költsége érdemben így becsülhető:
+\begin{equation}
+\mathcal{O}(N \cdot G \cdot d)
+\end{equation}
+
+Ez a becslés ugyan nem különíti el a célfüggvény részletes belső számításait, mégis jól mutatja, miért nő gyorsan a futási idő a populáció vagy az iteráció emelésével. A jelen benchmarkban ezért különösen fontos volt, hogy a GA(P=100) nem pusztán jobb átlagos minőséget adott, hanem elfogadható futási idő mellett tette ezt.
+
+Paraméterérzékenységi szempontból a következő megfigyelések adódnak a kód és az eredmények alapján:
+\begin{itemize}
+	\item a nagyobb populáció stabilabb keresést ad, de megnöveli a futási időt;
+	\item a PSO alacsony futási ideje mellett hajlamosabb korai stagnálásra;
+	\item a GWO kevés paraméterrel is erős baseline-t ad, különösen korlátozott keresési térben;
+	\item a hibrid modell csak akkor használja ki valóban az előnyeit, ha a PSO-fázis nem túl rövid, és a GA-fázis elegendő finomhangolási teret kap.
+\end{itemize}
+
+\section{Miért érdemes a jelenlegi HEMS-modellre építeni?}
+A HEMS optimalizálási probléma azért különösen alkalmas metaheurisztikák vizsgálatára, mert egyszerre tartalmaz:
+\begin{enumerate}
+	\item folytonos döntési változókat (akkumulátorteljesítmény),
+	\item diszkrét jellegű döntéseket (eszközök indítási ideje),
+	\item korlátokkal terhelt állapotdinamikát (SOC-határok),
+	\item nemlineáris és szcenáriófüggő célfüggvényt (ár, PV, load együtt).
+\end{enumerate}
+
+Ez a keverék indokolja, hogy a dolgozat nem egyetlen optimalizálási módszert, hanem több különböző keresési logikát hasonlít össze. A projekt jelenlegi formájában a legfontosabb kérdés nem az, hogy van-e egy abszolút mindenre legjobb algoritmus, hanem hogy melyik keresési stratégia milyen bemeneti realizmus mellett viselkedik stabilan.
+
+\section{A metaheurisztikák szerepe a terheléseltolásban}
+A terheléseltolásos HEMS-feladatokban a keresés nem csak költségminimalizálásról szól, hanem a megvalósíthatóság és a működési komfort közti egyensúlyról is. A GA képes több, eltérő kezdetű megoldást fenntartani; a PSO gyorsan reagál a jobb egyedekre; a GWO kiegyensúlyozott, hierarchikus keresést biztosít; a hibrid pedig egyesíti a feltáró és finomító fázisokat.
+
+Az eredmények alapján különösen fontos tanulság, hogy a megoldás minősége nem lineárisan javul a futási idő növelésével. Egyes esetekben a gyors algoritmusok is elérnek jó lokális megoldásokat, de a nagyobb változékonyságú napokon a robusztusabb keresési stratégia válik előnyössé.

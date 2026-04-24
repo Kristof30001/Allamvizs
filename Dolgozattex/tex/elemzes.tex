@@ -67,3 +67,68 @@ Elektromos autók mint mobil akkumulátorok: 60 kWh EV kapacitás $\rightarrow$ 
 
 \subsection{Közepes háztartásoknak (3--5 fő)}
 \textbf{Közepes háztartásoknak} egy komolyabb rendszer kiépítése ajánlott, amely a HEMS mellett egy 3--5 kWp-es napelemes rendszert és egy 5--10 kWh kapacitású akkumulátort is tartalmaz. Bár a beruházás összege 25000--35000 RON, ez támogatásokkal csökkenthető. A várható megtakarítás ebben az esetben jelentős, 30--50\% (évi 3000--5000 RON), így a megtérülési idő támogatással 3--5 évre, támogatás nélkül 6--8 évre becsülhető.
+
+\section{Kódbázis-alapú benchmark-értékelés}
+A jelenlegi projektállapotban a legfontosabb eredmények már nem csak a három klasszikus szcenárióból, hanem a real\_pv vs synthetic benchmarkból is származnak. Ez a futtatás 16 kiválasztott napot, 2 adatváltozatot (real PV és synthetic), 5 algoritmust és 2 ismétlést kombinál, vagyis összesen 320 algoritmusfuttatást értékel.
+
+Az összegzett eredményeket a következő táblázat foglalja össze, amely jól mutatja az algoritmusok minőség--sebesség kompromisszumát:
+
+\begin{table}[H]
+\centering
+\caption{A jelenlegi real\_pv vs synthetic benchmark fő eredményei}
+\label{tab:realpv_synth_summary}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Algoritmus} & \textbf{Adathalmaz} & \textbf{Átlagköltség} & \textbf{Gap \%} & \textbf{Átlagidő (s)} \\
+\midrule
+GA (P=100) & real\_pv & 13.61 & 0.96 & 0.156 \\
+GA (P=50)  & real\_pv & 13.90 & 32.08 & 0.079 \\
+GWO        & real\_pv & 14.23 & 60.65 & 0.119 \\
+Hybrid     & real\_pv & 15.43 & 82.20 & 0.066 \\
+PSO        & real\_pv & 16.70 & 159.08 & 0.055 \\
+\midrule
+GA (P=100) & synthetic & 10.47 & 0.91 & 0.159 \\
+GA (P=50)  & synthetic & 10.84 & 4.25 & 0.080 \\
+GWO        & synthetic & 11.62 & 10.80 & 0.120 \\
+Hybrid     & synthetic & 12.98 & 28.15 & 0.067 \\
+PSO        & synthetic & 13.52 & 33.21 & 0.056 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A táblázatból jól látszik, hogy a GA(P=100) mindkét adathalmazon a legkiegyensúlyozottabb megoldás: az átlagos költsége alacsony, a gap minimális, és a futási ideje még nem lépi túl drasztikusan a többi módszert. Ezzel szemben a PSO ugyan gyors, de a valós PV esetén a költségoldali teljesítménye jelentősen elmarad.
+
+A benchmark eredményei azt mutatják, hogy a valós PV-vel párosított napok nehezebb keresési környezetet jelentenek. Ezt az is alátámasztja, hogy a legjobb átlagköltség real\_pv esetén magasabb, mint a synthetic esetén, miközben a GA(P=100) mindkét adathalmazon megőrzi az első helyet az átlagos rés (gap) szerint. A részletes riport alapján:
+\begin{itemize}
+	\item real\_pv: GA(P=100) átlag gap = 0.96\%, győzelmi arány = 62.5\%,
+	\item synthetic: GA(P=100) átlag gap = 0.91\%, győzelmi arány = 75.0\%.
+\end{itemize}
+
+Ez két fontos következtetést enged meg. Egyrészt a GA(P=100) nem csak egyes napokon teljesít jól, hanem a profilok egészén stabil marad. Másrészt a synthetic adatokon valamivel erősebb a dominanciája, ami azt sugallja, hogy a valós PV-idősorok bevezetése valóban növeli a probléma nehézségét.
+
+\section{Mit jelent a különbség a real és a synthetic dataset között?}
+Az egyik legfontosabb mérnöki tanulság, hogy a valós PV-idősor nem csak "szebb bemenet", hanem ténylegesen módosítja az optimalizálási tájképet. A real\_pv futásokban a megoldások költségszórása és az algoritmusok közti gap különbsége nagyobb, vagyis a solvernek nem csupán a terhelés áthelyezését, hanem a napelemtermelés időbeli torzulásait is kezelnie kell.
+
+A synthetic változat ezzel szemben kontrolláltabb környezetet ad: a termelés és fogyasztás generált, ezért a modell belső logikája jobban illeszkedik a keresési stratégiákhoz. Ez nem hibája a modellnek, hanem előnye a vizsgálatnak: így külön látszik, hogy mennyit veszít vagy nyer az algoritmus a bemeneti realizmus növelésével.
+
+\section{Algoritmusok közötti gyakorlati különbségek}
+A projekt eredményei nem csak sorrendet, hanem szerepköröket is kijelölnek:
+\begin{itemize}
+	\item \textbf{GA(P=100)}: a legjobb általános választás, mert stabil és jól kezeli a változó profilokat;
+	\item \textbf{GA(P=50)}: jó kompromisszum, ha a futásidő fontosabb, de a stabilitás még kell;
+	\item \textbf{GWO}: alacsonyabb paraméterigény mellett is erős alternatíva, különösen zártabb keresési térben;
+	\item \textbf{Hybrid}: gyors és kiegyensúlyozott, de a jelen konfigurációban nem hoz minden esetben elég extra javulást;
+	\item \textbf{PSO}: a leggyorsabb, de az eredmények alapján a költségoptimalizálásban a leginkább sérülékeny.
+\end{itemize}
+
+Ez a szereposztás nagyon fontos, mert a védés során egyértelműen meg lehet mutatni: a projekt nem csupán azt bizonyítja, hogy "melyik a legjobb algoritmus", hanem azt is, hogy különböző üzemeltetési prioritások mellett más-más módszer lehet a legpraktikusabb.
+
+\section{A jelenlegi modell gyakorlati értéke}
+A modell még nem végleges ipari rendszer, de tudományos és mérnöki szempontból már most is értékes. Három okból:
+\begin{enumerate}
+	\item valós árinformációt használ,
+	\item elkülöníti a bemeneti realizmus és az algoritmikus teljesítmény hatását,
+	\item auditálható, mivel a nyers adatok és az összegző metrikák is mentve vannak.
+\end{enumerate}
+
+Ez azt jelenti, hogy a dolgozat következtetései nem "egy futásból származó benyomások", hanem visszakereshető, strukturált benchmark-eredmények.
