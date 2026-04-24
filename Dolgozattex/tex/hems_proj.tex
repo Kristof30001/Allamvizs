@@ -12,7 +12,7 @@
 \usepackage{float}
 \usepackage{colortbl} 
 
-\graphicspath{{images/}{ekim2339_proj/}}
+\graphicspath{{../images/}{../../}{../../ekim2339_proj/}}
 
 \submityear{2026}
 \doctypeHU{Projektjelentés}
@@ -37,7 +37,7 @@
 \maketitle
 
 \begin{abstractEN}
-This project report studies the optimization of a Home Energy Management System (HEMS) using nature-inspired metaheuristics. We formulate a cost-minimization scheduling problem with practical constraints (e.g., appliance timing, PV generation uncertainty, and battery operation) and compare four approaches: Genetic Algorithm (GA), Particle Swarm Optimization (PSO), Grey Wolf Optimizer (GWO), and a hybrid GA--PSO method. Experiments are evaluated on multiple seasonal scenarios (winter, summer, and cloudy days) using repeated runs to assess robustness. The results highlight that algorithm choice depends on the operating scenario: exploration-focused methods perform better under uncertainty, while constraint-heavy cases benefit from stronger exploitation. Finally, we summarize implementation recommendations and the expected economic and environmental impact.
+This updated report extends the original HEMS benchmark by integrating real day-ahead electricity prices (ENTSO-E, RO zone), reorganizing experiment outputs, and adding richer visual analytics. The optimization core remains a comparative evaluation of nature-inspired metaheuristics (GA, PSO, GWO, Hybrid), while the input realism is improved through real PV day profiles and real hourly price signals. The updated pipeline stores outputs in structured folders (tables/reports/plots), generates day-level and summary PNG figures, and preserves reproducibility through fixed seeds. Results indicate that ranking remains scenario-dependent, but robustness conclusions are now better supported by clearer reporting artifacts. This document keeps the original thesis structure and adds a dedicated chapter summarizing modifications, current status, and immediate next steps.
 \end{abstractEN}
 
 { \baselineskip 3ex
@@ -53,11 +53,12 @@ This project report studies the optimization of a Home Energy Management System 
 \include{elmelet}
 \include{gyakorlat}
 \include{elemzes}
+\include{frissites}
 
 \appendix
 \include{programok}
 
 \bibliographystyle{abbrvnat_hu}
-\bibliography{dolgozat}
+\bibliography{../dolgozat}
 
 \end{document}

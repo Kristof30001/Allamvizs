@@ -1,0 +1,9 @@
+PWD /home/kristof/Dokumentumok/Allamvizs/Dolgozattex/tex
+INPUT /etc/texmf/web2c/texmf.cnf
+INPUT /usr/share/texmf/web2c/texmf.cnf
+INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
+INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
+INPUT /home/kristof/Dokumentumok/Allamvizs/Dolgozattex/tex/hems_proj.tex
+OUTPUT hems_proj.log
+INPUT /usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+INPUT /usr/share/texlive/texmf-dist/tex/latex/xcolor/xcolor.sty
