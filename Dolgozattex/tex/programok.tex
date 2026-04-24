@@ -13,3 +13,46 @@
 \section{Mintakódrészlet}
 Az alábbi példa a hibrid algoritmus fő lépéseit illusztrálja:
 \lstinputlisting[language=Python, firstline=62, lastline=116]{../progfiles/algorithms.py}
+
+\section{Futtatási architektúra (jelenlegi állapot)}
+A kódbázis jelenleg két fő végrehajtási útvonalat tartalmaz:
+\begin{itemize}
+    \item \texttt{main.py}: klasszikus szezonális benchmark (winter/summer/cloudy),
+    \item \texttt{benchmark\_real\_vs\_synthetic.py}: valós PV vs szintetikus összehasonlító pipeline.
+\end{itemize}
+
+Az első útvonal gyors prototípus- és vizualizációs célra hasznos, míg a második útvonal kutatási riportolásra optimalizált, strukturált outputokkal.
+
+\section{Modulszintű felelősségek}
+\begin{itemize}
+    \item \textbf{\texttt{hems\_problem.py}}: célfüggvény, korlátkezelés, energiamérleg, SOC logika.
+    \item \textbf{\texttt{algorithms.py}}: GA/PSO/GWO/Hybrid solver osztályok.
+    \item \textbf{\texttt{data\_generator.py}}: szintetikus load/PV profilok és CSV betöltő/validáló segédek.
+    \item \textbf{\texttt{price\_loader.py}}: ENTSO-E áradat parsing, órás aggregáció, napi ármap felépítés.
+    \item \textbf{\texttt{benchmark\_real\_vs\_synthetic.py}}: profilépítés, kiértékelés, aggregáció, riport és plot mentés.
+\end{itemize}
+
+Ez a szeparáció csökkenti a modulok közti csatoltságot, és lehetővé teszi, hogy egy-egy részegységet (például árbetöltés vagy célfüggvény) külön fejlesszünk, anélkül hogy a teljes pipeline-t újra kellene tervezni.
+
+\section{Adat- és eredmény-artefaktok}
+A benchmark pipeline kimenetei strukturáltan jelennek meg:
+\begin{itemize}
+    \item nyers futásszintű táblázat (
+    \texttt{results\_realpv\_vs\_synth\_raw.csv}),
+    \item aggregált összegzés (
+    \texttt{summary/gaps/winners}),
+    \item markdown report,
+    \item napi és összegző ábrák.
+\end{itemize}
+
+Gyakorlati előny, hogy minden végső ábra visszavezethető a nyers táblázatokra, így a dolgozatban szereplő állítások auditálhatók.
+
+\section{Reprodukálhatósági szempontok}
+A kódban alkalmazott determinisztikus seedelés miatt ugyanazon inputfájlokkal a futások reprodukálhatók. A projektszerkezetben külön mappák választják el a forráskódot, a riportot és az ábrákat, ami támogatja a verziózhatóságot és a visszaellenőrizhetőséget.
+
+Kutatási szempontból ez különösen fontos, mert:
+\begin{enumerate}
+    \item az eredmények nem "egyszeri szerencsés" futások,
+    \item a parameter-változtatások hatása összehasonlítható,
+    \item a bővítések (pl. degradációs költség, több eszköz) kontrolláltan mérhetők.
+\end{enumerate}

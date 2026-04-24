@@ -24,6 +24,45 @@ A benchmark futásban kiválasztott napok száma 16. A valós PV profilok az inv
   \item 5 algoritmus kerül kiértékelésre (GA(P=50), GA(P=100), PSO, GWO, Hybrid).
 \end{itemize}
 
+Az adatfolyam implementációs sorrendje:
+\begin{enumerate}
+  \item inverteres idősorokból órás PV előállítás (napi bontás),
+  \item ár-CSV feldolgozás és RON/kWh konverzió,
+  \item napi profilok összeépítése (
+  \texttt{real\_pv} és \texttt{synthetic}),
+  \item algoritmusfuttatás és nyers eredmények mentése,
+  \item aggregálás, gap/winner számítás, report és ábragenerálás.
+\end{enumerate}
+
+\section{Árbetöltés és fallback logika}
+A valós árbetöltésnél először a \texttt{GUI\_ENERGY\_PRICES\_*.csv} állományok közül a legnagyobb (tipikusan éves) fájl kerül kiválasztásra. A feldolgozás során területi szűrés (RO zóna), órás újramintavételezés és hiányérték-kezelés történik. Ha egy napra nincs teljes 24 órás valós árvektor, a rendszer TOU fallback árat használ.
+
+Ez a megközelítés két szempontból fontos:
+\begin{itemize}
+  \item robusztus futtatást biztosít hiányos adat esetén is,
+  \item transzparensen jelzi, mely napoknál történt fallback.
+\end{itemize}
+
+\section{Összegző metrikák és győzteskép}
+A frissített kiértékelés nem csak átlagköltséget számol, hanem profile-szintű versenyképességi mutatókat is. A rendszer minden profilnál meghatározza az algoritmusonkénti legjobb költséget, majd ehhez viszonyítja a globális napi legjobbat. Ebből képződik az átlagos résmutató (gap), valamint a győzelmi arány.
+
+Ez a riportolási forma jobban elkülöníti:
+\begin{itemize}
+  \item a stabilan jó algoritmust (alacsony átlagos gap),
+  \item az alkalmi nyertes algoritmust (magas, de szórt győzelmek),
+  \item és a gyors, de gyengébb minőségű megoldásokat (runtime előny, költség-hátrány).
+\end{itemize}
+
+\section{Reprodukálhatóság és kimeneti artefaktok}
+A pipeline minden lépése determinisztikus seedeléssel futtatható, így ugyanazon inputok mellett a nyers és aggregált kimenetek reprodukálhatók. Az artefaktok szétválasztása (\texttt{tables}, \texttt{reports}, \texttt{plots/days}, \texttt{plots/summary}) támogatja a tudományos visszakövethetőséget:
+\begin{itemize}
+  \item \texttt{tables}: adatforrás a statisztikai ellenőrzéshez,
+  \item \texttt{reports}: emberileg olvasható összegzés,
+  \item \texttt{plots}: kvalitatív és kvantitatív vizuális validáció.
+\end{itemize}
+
+Ennek köszönhetően a dolgozatban szereplő következtetések közvetlenül visszavezethetők a mentett nyers mérési sorokra.
+
 \section{Kimeneti struktúra}
 A korábbi ``ömlesztett'' mentés helyett a projekt kimenetei rendezett formában készülnek:
 \begin{itemize}

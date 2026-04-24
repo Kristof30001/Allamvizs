@@ -38,3 +38,30 @@ Ha egy adott napon a csucsfogyasztas 4 kW, az atlag pedig 2 kW, akkor $PAR = 2$.
 \begin{meg}
 A PAR csokkentese nem csak koltsegcsokkentessel jar, hanem a halozati csucsok merseklesevel is, ami a szolgaltato szamara is elonyos.
 \end{meg}
+
+\section{Optimalizálási modell és döntési változók}
+A jelenlegi implementációban a napi optimalizálási feladat 24 órás horizonton fut, ahol a döntési vektor két fő részre bontható:
+\begin{itemize}
+	\item akkumulátor teljesítmény-vektor: $p_{batt}(t)$, $t=0,\dots,23$,
+	\item eltolható eszközök indítási ideje: $s_j$, ahol $j$ az eszköz indexe.
+\end{itemize}
+
+Az energiamérleg óránként:
+\begin{equation}
+P_{grid}(t) = P_{load}(t) + P_{shift}(t) - P_{pv}(t) + p_{batt}(t)
+\end{equation}
+ahol $P_{shift}(t)$ az időzített fogyasztók (pl. mosógép, mosogatógép) által hozzáadott terhelés.
+
+A napi célfüggvény a hálózati energia költségét és a korlátsértési büntetéseket egyesíti:
+\begin{equation}
+J = \sum_{t=0}^{23} C_t(P_{grid}(t),\pi(t)) + \lambda_{soc} \cdot \Phi_{soc} + \lambda_{end} \cdot \Phi_{end}
+\end{equation}
+ahol $\pi(t)$ az órás ár, $\Phi_{soc}$ a SOC-határok sértésének büntetése, $\Phi_{end}$ pedig a napvégi SOC-visszatérés büntetése.
+
+\section{Korlátok és büntetéses kezelés}
+A kódban explicit korlátok szerepelnek az akkumulátorra és az időzített eszközökre. Az akkumulátornál az állapotváltozó (SOC) minimális és maximális értéke közé szorítás történik, amelyet kvadratikus büntetéssel egészítünk ki. Ez gyakorlatban stabilabb keresést ad, mint a tisztán "hard" eldobásos korlátkezelés.
+
+Az időzített eszközöknél az indítási idő folytonos döntési változóként jelenik meg, de a kiértékelés során egész órára kerekítés történik. Ez a modell egyszerre tartja meg a metaheurisztikák folyamatos keresési előnyeit, miközben fizikailag értelmezhető ütemezést ad.
+
+\section{Vétel és visszatáplálás aszimmetriája}
+A jelenlegi költségmodellben a hálózati vételezés teljes órás áron történik, míg a visszatáplálás csökkentett szorzóval kerül elszámolásra. Ez az aszimmetria valós üzemeltetési helyzeteket közelít: a túltermelés nem azonos értékű a csúcsidős fogyasztás kiváltásával. Emiatt az optimalizáló természetes módon olyan stratégiákat preferál, amelyek inkább lokális önfogyasztást és jól időzített akkumulátor-használatot valósítanak meg.
