@@ -223,3 +223,85 @@ class DataGenerator:
             )
 
         return profiles
+
+
+def load_real_consumption(csv_path="household_power_consumption.csv", days=1):
+    """
+    Beolvassa az UCI valós okosotthon fogyasztási adatokat (1 perces felbontás),
+    és átalakítja órás felbontású (kW) profillá a HEMS szimuláció számára.
+    
+    Args:
+        csv_path: A household_power_consumption.csv fájl elérési útja
+        days: Hány nap adatát szeretnénk betölteni (24 óra = 1 nap)
+    
+    Returns:
+        np.ndarray: Órás fogyasztási profil (kW), max 24 elem
+    
+    Megjegyzés:
+        A perces adatokat resample-vel átlagoljuk órás felbontásra,
+        hogy passzoljon az 1 órás ár- és PV-adatokhoz.
+    """
+    try:
+        import pandas as pd
+    except ImportError:
+        raise ImportError("A real_consumption betöltéshez szükséges a pandas: pip install pandas")
+    
+    try:
+        print(f"Valós fogyasztási adatok beolvasása ({csv_path})...")
+        
+        # 1. Beolvasás (csak a szükséges oszlopok)
+        df = pd.read_csv(csv_path, usecols=['Date', 'Time', 'Global_active_power'], 
+                        low_memory=False, na_values='?')
+        
+        # 2. Numerikus konverzió
+        df['Global_active_power'] = pd.to_numeric(df['Global_active_power'], errors='coerce')
+        
+        # 3. Dátum és idő egyesítése
+        df['Datetime'] = pd.to_datetime(df['Date'] + ' ' + df['Time'], 
+                                       dayfirst=True, format='mixed', errors='coerce')
+        df = df.dropna(subset=['Datetime'])
+        df.set_index('Datetime', inplace=True)
+        
+        # 4. Órás felbontás készítése átlagolással
+        df_hourly = df[['Global_active_power']].resample('h').mean()
+        
+        # 5. Hiányzó órák kitöltése (forward fill, majd backward fill)
+        df_hourly.ffill(inplace=True)
+        df_hourly.bfill(inplace=True)
+        
+        # 6. Szükséges óraszám meghatározása
+        hours_needed = int(days * 24)
+        
+        # 7. Adatok kiválasztása (egy jó téli kezdődátumtól, kb 2007 február)
+        try:
+            profile = df_hourly.loc['2007-02-01':]['Global_active_power'].values[:hours_needed]
+        except:
+            # Ha az első megoldás nem működik, az első elérhető dátumtól indulunk
+            profile = df_hourly['Global_active_power'].values[:hours_needed]
+        
+        # 8. Kitöltés vagy csonkítás, hogy pontosan 24*days órára jussunk
+        if len(profile) < hours_needed:
+            # Ha kevesebb adat van, kitöltjük az átlag értékkel
+            mean_val = np.nanmean(profile) if len(profile) > 0 else 0.5
+            profile = np.concatenate([profile, np.full(hours_needed - len(profile), mean_val)])
+        else:
+            # Ha több van, csonkítunk
+            profile = profile[:hours_needed]
+        
+        # 9. Biztonsági konverziók: negatív értékek -> 0, NaN -> 0
+        profile = np.nan_to_num(profile, nan=0.0)
+        profile = np.clip(profile, 0.0, None)
+        
+        print(f"✓ Valós fogyasztási profil betöltve ({len(profile)} óra, "
+              f"átlag: {np.mean(profile):.2f} kW)")
+        
+        return profile
+        
+    except FileNotFoundError:
+        print(f"❌ HIBA: {csv_path} nem található!")
+        print("   Helyettesítés: szintetikus profil használata fallback-ként.")
+        return None
+    except Exception as e:
+        print(f"❌ HIBA a valós fogyasztási adat betöltésénél: {e}")
+        print("   Helyettesítés: szintetikus profil használata fallback-ként.")
+        return None

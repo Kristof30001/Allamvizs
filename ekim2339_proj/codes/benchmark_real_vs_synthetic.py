@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from algorithms import GA, PSO, GWO, Hybrid
-from data_generator import DataGenerator
+from data_generator import DataGenerator, load_real_consumption
 from hems_problem import SmartHomeEnvironment
 from price_loader import (
     build_daily_price_map,
@@ -94,7 +94,14 @@ def resolve_day_price(day, day_price_map, default_price):
     return default_price.copy()
 
 
-def build_realpv_profiles(real_pv_profiles, day_price_map, gen, load_replicas, seed_base):
+def build_realpv_profiles(real_pv_profiles, day_price_map, gen, load_replicas, seed_base, load_source="synthetic", real_load_profile=None):
+    """
+    Valós PV adatokat tartalmazó profilokat építünk.
+    
+    Args:
+        load_source: "synthetic" (generált) vagy "real" (UCI adatsor)
+        real_load_profile: Ha load_source="real", akkor az órás fogyasztási profil numpy tömb
+    """
     profiles = []
     default_price = gen.get_tou_prices().copy()
     for day in SELECTED_DAYS:
@@ -104,11 +111,21 @@ def build_realpv_profiles(real_pv_profiles, day_price_map, gen, load_replicas, s
         season = meta["season"]
         for rep in range(load_replicas):
             rng = np.random.default_rng(seed_base + stable_seed_from_day_rep(day, rep))
-            load = gen.generate_load_profile(season=season, rng=rng)
+            
+            # Fogyasztás forrásának kiválasztása
+            if load_source == "real" and real_load_profile is not None:
+                # Valós adatokból vegyünk 24 órát
+                start_idx = (rep * 24) % (len(real_load_profile) - 24)
+                load = real_load_profile[start_idx:start_idx + 24].copy()
+            else:
+                # Szintetikus generálás
+                load = gen.generate_load_profile(season=season, rng=rng)
+            
+            dataset_name = f"real_pv_load_{load_source}"
             profiles.append(
                 {
                     "profile_id": f"{day}_rep{rep:02d}",
-                    "dataset": "real_pv",
+                    "dataset": dataset_name,
                     "day": day,
                     "season": season,
                     "load": load,
@@ -119,7 +136,14 @@ def build_realpv_profiles(real_pv_profiles, day_price_map, gen, load_replicas, s
     return profiles
 
 
-def build_synthetic_profiles(real_pv_profiles, day_price_map, gen, load_replicas, seed_base):
+def build_synthetic_profiles(real_pv_profiles, day_price_map, gen, load_replicas, seed_base, load_source="synthetic", real_load_profile=None):
+    """
+    Szintetikus PV adatokat tartalmazó profilokat építünk.
+    
+    Args:
+        load_source: "synthetic" (generált) vagy "real" (UCI adatsor)
+        real_load_profile: Ha load_source="real", akkor az órás fogyasztási profil numpy tömb
+    """
     profiles = []
     default_price = gen.get_tou_prices().copy()
     for day in SELECTED_DAYS:
@@ -128,12 +152,22 @@ def build_synthetic_profiles(real_pv_profiles, day_price_map, gen, load_replicas
         season = real_pv_profiles[day]["season"]
         for rep in range(load_replicas):
             rng = np.random.default_rng(seed_base + 10_000_000 + stable_seed_from_day_rep(day, rep))
-            load = gen.generate_load_profile(season=season, rng=rng)
+            
+            # Fogyasztás forrásának kiválasztása
+            if load_source == "real" and real_load_profile is not None:
+                # Valós adatokból vegyünk 24 órát
+                start_idx = (rep * 24) % (len(real_load_profile) - 24)
+                load = real_load_profile[start_idx:start_idx + 24].copy()
+            else:
+                # Szintetikus generálás
+                load = gen.generate_load_profile(season=season, rng=rng)
+            
             pv = gen.generate_pv_profile(season=season, rng=rng)
+            dataset_name = f"synthetic_pv_load_{load_source}"
             profiles.append(
                 {
                     "profile_id": f"{day}_rep{rep:02d}",
-                    "dataset": "synthetic",
+                    "dataset": dataset_name,
                     "day": day,
                     "season": season,
                     "load": load,
@@ -525,28 +559,73 @@ def main():
     if missing_days:
         print("Figyelem, ezekre a napokra nem volt adatsor:", missing_days)
 
-    real_profiles = build_realpv_profiles(real_pv_map, day_price_map, gen, LOAD_REPLICAS, SEED_BASE)
-    synth_profiles = build_synthetic_profiles(real_pv_map, day_price_map, gen, LOAD_REPLICAS, SEED_BASE)
-
+    # ============================================================
+    # 2x2 KÍSÉRLET MÁTRIX: PV × Load kombinációk
+    # ============================================================
+    # Valós fogyasztási profil betöltése az UCI adatsorból
+    # Valós fogyasztási profil betöltése az UCI adatsorból (kisebb, előtisztított verzió)
+    # Az előtisztított, kisebb verzió használata (13 MB helyett 47 MB)
+    consumption_csv = Path(__file__).resolve().parents[2] / "consumtion" / "household_power_consumption_2.csv"
+    
+    real_load_profile = load_real_consumption(
+        csv_path=str(consumption_csv),
+        days=60  # 60 nap adat a variáció érdekében
+    )
+    
+    all_profiles = []
+    experiments = [
+        ("real_pv", "synthetic"),   # 1. Valós PV + Szintetikus Load
+        ("real_pv", "real"),        # 2. Valós PV + Valós Load
+        ("synthetic", "synthetic"), # 3. Szintetikus PV + Szintetikus Load
+        ("synthetic", "real"),      # 4. Szintetikus PV + Valós Load
+    ]
+    
+    print(f"\n{'='*70}")
+    print("2x2 BENCHMARK MÁTRIX: PV Termelés × Háztartási Fogyasztás")
+    print(f"{'='*70}")
+    
+    for pv_type, load_type in experiments:
+        print(f"\n→ Profil készítés: PV={pv_type}, Load={load_type}")
+        
+        if pv_type == "real_pv":
+            profiles_batch = build_realpv_profiles(
+                real_pv_map, day_price_map, gen, LOAD_REPLICAS, SEED_BASE,
+                load_source=load_type,
+                real_load_profile=real_load_profile if load_type == "real" else None
+            )
+        else:  # synthetic PV
+            profiles_batch = build_synthetic_profiles(
+                real_pv_map, day_price_map, gen, LOAD_REPLICAS, SEED_BASE,
+                load_source=load_type,
+                real_load_profile=real_load_profile if load_type == "real" else None
+            )
+        
+        all_profiles.extend(profiles_batch)
+        print(f"   ✓ {len(profiles_batch)} profil készítve")
+    
     if day_price_map:
         missing_price_days = [d for d in SELECTED_DAYS if d not in day_price_map]
         if missing_price_days:
-            print("Figyelem: ezekre a napokra TOU fallback ar lesz:", missing_price_days)
+            print(f"\nFigyelem: ezekre a napokra TOU fallback ar lesz: {missing_price_days}")
     else:
-        print("Minden profil TOU arat hasznal (valos ar map ures).")
+        print("\nFigyelem: Minden profil TOU arat hasznal (valos ar map ures).")
 
-    profiles = real_profiles + synth_profiles
-    print(f"Profilok szama: {len(profiles)} (real_pv={len(real_profiles)}, synthetic={len(synth_profiles)})")
+    profiles = all_profiles
+    print(f"\nÖsszes profil: {len(profiles)}")
+    print(f"  - Kísérlet kombinációk: {len(experiments)}")
+    print(f"  - Napok/kombináció: {len(SELECTED_DAYS)}")
+    print(f"  - Terhelés replikák/nap: {LOAD_REPLICAS}")
 
     raw_df = evaluate_profiles(profiles, RUNS_PER_PROFILE, SEED_BASE)
     summary_df, gaps_df, winners_df = build_summary(raw_df)
 
-    raw_path = dirs["tables"] / "results_realpv_vs_synth_raw.csv"
-    summary_path = dirs["tables"] / "results_realpv_vs_synth_summary.csv"
-    gaps_path = dirs["tables"] / "results_realpv_vs_synth_gaps.csv"
-    winners_path = dirs["tables"] / "results_realpv_vs_synth_winners.csv"
-    report_path = dirs["reports"] / "results_realpv_vs_synth_report.md"
-    json_path = dirs["tables"] / "results_realpv_vs_synth_summary.json"
+    # Output fájlnevei a 2x2 mátrixhoz (új verzió)
+    raw_path = dirs["tables"] / "results_2x2_benchmark_raw.csv"
+    summary_path = dirs["tables"] / "results_2x2_benchmark_summary.csv"
+    gaps_path = dirs["tables"] / "results_2x2_benchmark_gaps.csv"
+    winners_path = dirs["tables"] / "results_2x2_benchmark_winners.csv"
+    report_path = dirs["reports"] / "results_2x2_benchmark_report.md"
+    json_path = dirs["tables"] / "results_2x2_benchmark_summary.json"
 
     raw_df.to_csv(raw_path, index=False)
     summary_df.to_csv(summary_path, index=False)

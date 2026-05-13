@@ -19,7 +19,68 @@ A \ref{fig:winter_day}. ábra a téli szcenárió egy tipikus napjának PV-terme
 \label{fig:winter_box}
 \end{figure}
 
+\section{A 2x2-es kísérleti mátrix: robusztusság validálása}
+\label{sec:matrix_2x2}
+
+Az algoritmusok valódi robusztusságának megismeréséhez az egyszerű szezonális tesztelésből továbblépünk egy szofisztikáltabb megközelítésre: a \textbf{2x2-es kísérleti mátrixra} (PV termelés × Háztartási fogyasztás kombinációja).
+
+\subsection{Motiváció}
+A korábbi szintetikus profil-alapú tesztelés biztosított egy "tiszta laborkörnyezetet", ahol az inputok jól szabályozhatók voltak. De az igazi, gyakorlati alkalmazásban az optimalizátornak \textit{egyszerre} kell kezelni:
+\begin{itemize}
+	\item \textbf{Termelési oldalon}: a valós időjárási adatokból származó, előre nem látható termelésfluktuációkat (felhőzet, napszög),
+	\item \textbf{Fogyasztási oldalon}: a valós háztartások sajátos, oft véletlenszerű fogyasztási szokásait (mikróhullámú sütő, mosógép, TV-ezés).
+\end{itemize}
+
+Ahhoz, hogy az algoritmusok \textit{generalizálhatóságát} is teszteljük, négy kombinációt érték el:
+
+\begin{table}[H]
+\centering
+\caption{2x2-es kísérleti mátrix: termelés és fogyasztás kombinációi}
+\label{tab:matrix_2x2}
+\begin{tabular}{c|cc}
+\hline
+\textbf{} & \textbf{Szintetikus Load} & \textbf{Valós Load (UCI)} \\
+\hline
+\textbf{Szintetikus PV} & (1) Lab-ideális & (3) Fogyasztási zaj \\
+& Szezonális görbe & Valódi háztartási data \\
+\hline
+\textbf{Valós PV} & (2) Termelési zaj & (4) Valós Világ \\
+& Inverter inverter adatok & Dupla zaj: PV + Load \\
+\hline
+\end{tabular}
+\end{table}
+
+A négy eset, sorrendben:
+\begin{enumerate}
+	\item \textbf{Szintetikus–Szintetikus (Lab-ideális)}: Az "elméleti maximum" eset. Mind az inverter, mind a fogyasztási terhelés tiszta, szinuszos görbék. Ez az eset azt mutatja meg, hogy az algoritmusok "jó körülmények között" mennyire optimálisak.
+	
+	\item \textbf{Valós PV–Szintetikus Load}: A termelés valódi inverter-adatok alapján jön (felhős napok, hirtelen fordulatok), de a fogyasztás még tiszta, generált görbe. Ez elkülöníti a \textit{termelési oldal bizonytalanságának} hatását.
+	
+	\item \textbf{Szintetikus PV–Valós Load}: Az UCI Machine Learning Repository okosóra adatsorából származó, valódi háztartási fogyasztás. A termelés viszont még ideális. Ez a \textit{fogyasztási oldal zaja} (pl. hajszárító, mikróhullámú sütő véletlenszerű bekapcsolása) hatását mutatja meg.
+	
+	\item \textbf{Valós PV–Valós Load}: A "teljes valóság": mindkét oldal zajos. Ez az a forgatókönyv, ahol az algoritmusnak az összes szabadságfokozat ismeretében kell döntenie.
+\end{enumerate}
+
+\subsection{A 2x2-es mátrix tudományos értéke}
+Ez a fajta kereszt-validáció az algoritmus-értékelésben már standard a kutatásban (pl. képfeldolgozásban, időjárás-előrejelzésben). A HEMS-kontextusban azonban újszerűnek számít. Az előnye:
+\begin{itemize}
+	\item \textbf{Szeparáció}: Azonosítható, hogy az algoritmus "zaja" melyik forrásból ered.
+	\item \textbf{Generalizálhatóság}: Ha egy algoritmus az (1)-es eseten nyeri, de a (4)-esben lezuhan, az erős indikátor az overfitting-ről.
+	\item \textbf{Robusztusság-sorrend}: Az algoritmusok gyakorlati hasznossága nem az elméleti esetből, hanem a (4)-es valós esetet alapján rangsorolható.
+\end{itemize}
+
+A mátrix konfigurációja:
+\begin{itemize}
+	\item 16 kiválasztott nap (4 évszak × 4 nap),
+	\item 5 algoritmus (GA-50, GA-100, PSO, GWO, Hybrid),
+	\item 2 futás / profil / algoritmus,
+	\item 4 kombinációs eset.
+\end{itemize}
+
+Összesen: \(16 \times 2 \times 5 \times 4 = 640\) algoritmus-futtatás, amely az algoritmusok teljesítménystabilitásáról ad részletes képet.
+
 \section{Főbb megállapítások}
+
 A kísérletek rávilágítottak a \textbf{szezonális különbségek} fontosságára. Nyáron az optimalizáció kulcsa a többlettermelés menedzselése (az akkumulátor töltése vagy visszatáplálás), míg télen a drága csúcsidőszaki fogyasztás minimalizálása a cél. A vizsgált három szcenárió (tél, nyár, borús) megfelelően lefedi a valós üzemeltetési körülményeket. Az \textbf{algoritmus választást} illetően megállapítható, hogy nincs egyetlen "legjobb" módszer. A GA (P=100) a komplex, változékony esetekben bizonyult robusztusnak, míg a GWO a szigorúbb korlátokkal terhelt téli környezetben működött hatékonyabban. Az \textbf{akkumulátor szerepe} különösen a borús tesztesetben mutatkozott meg, ahol kulcsfontosságúnak bizonyult a termelés ingadozásainak kisimításában. A \textbf{futási teljesítmény} tekintetében az algoritmusok 0.21 és 0.92 másodperc közötti idő alatt találtak megoldást; a PSO volt a leggyorsabb, de ez gyakran a megoldás minőségének rovására ment.
 
 \section{Gazdasági megtérülés}
