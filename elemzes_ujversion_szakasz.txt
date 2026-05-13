@@ -1,0 +1,29 @@
+\section{Jövőbeli kutatási irányok}
+
+A jelenlegi HEMS-modell számos kiterjesztési lehetőséget rejt, amely a jövőbeni kutatás és fejlesztés irányait mutatja:
+
+\begin{itemize}
+	\item \textbf{Energiaközösségek (REC):} Peer-to-peer energia kereskedés, közösségi akkumulátor-hálózatok; potenciális további megtakarítás 10--15\%. Ez a modell különösen alkalmazható városi lakóparkok vagy községi szövetkezetek számára.
+	
+	\item \textbf{Multi-objective optimalizálás:} Pareto-front alapú megközelítés, amelyben a felhasználó dinamikusan választhat költség-komfort görbéről adaptív súlyozás segítségével. Így rugalmasabb vezérlés válik lehetővé, ami figyelembe veszi az egyéni preferenciákat.
+	
+	\item \textbf{Gépi tanulás integráció:} LSTM-alapú időjárás-előrejelzés, felhasználói szokások tanulása, prediktív karbantartási rendszerek. E megközelítések további 5--10\%-os hatékonyság-javulást eredményezhetnek.
+	
+	\item \textbf{Vehicle-to-Grid (V2G) integráció:} Elektromos autók mint mobil akkumulátorok beépítése az energiarendszerbe. Egy 60 kWh-s EV akku 6-szor nagyobb tárolási kapacitást jelent, ami 50--100 RON/hó plusz bevételt generálhat az agregált kereskedelem révén.
+\end{itemize}
+
+E kiterjesztések közül az LSTM-alapú előrejelzés és a V2G már ipari pilóta-projektekben is testesülnek meg (pl. Németország, Hollandia, Dánia), így az elméleti potenciál valósággá válásának az esélye magas.
+
+\section{Implementációs ajánlások és gazdasági szcenáriók}
+
+A szakdolgozat eredményei alapján három fő háztartási szegmensre ajánlható az okos energia-menedzsment rendszer, mindegyikre szabva a gazdasági és technikai jellemzőket:
+
+\begin{description}
+	\item[Kis háztartások (< 3 fő):] Egy minimális HEMS-konfiguráció javasolt, amely egy vezérlőegységből és intelligens konnektorokból áll. Az adatok alapján elérhető 15--20\%-os megtakarítás (évi 500--800 RON) mellett a 800--1200 RON-os beruházás 1.5--2 év alatt megtérül. Ezek a háztartások elsősorban a terhelés-eltolásban (pl. mosógép futtatása olcsóbb áras időszakban) találnak lehetőséget.
+	
+	\item[Közepes háztartások (3--5 fő):] Egy komplettebb rendszer kiépítése ajánlott: HEMS vezérlő + 3--5 kWp-es napelemes rendszer + 5--10 kWh akkumulátor. A 25000--35000 RON-os beruházás (támogatásokkal csökkenthető) 30--50\%-os megtakarítást (évi 3000--5000 RON) eredményez. Megtérülési idő: 3--5 év támogatással, 6--8 év nélküle. Itt az akkumulátor szerepe kritikus a saját termelés hatékony kihasználásában.
+	
+	\item[Nagy háztartások (> 5 fő):] Teljes rendszer: 5--10 kWp-es PV + 10--20 kWh sztoráz + felsőbb szintű HEMS. A 40000--60000 RON-os beruházás 50\% feletti megtakarítást (évi 6000--8000 RON) eredményez, így az 3--4 év alatt térül meg támogatásokkal. Ezeken a háztartásokon az egy-két napi akkumulátor-kapacitás lehetővé teszi az intelligens vásárlást az napi áringadozások alapján.
+\end{description}
+
+Az implementáció javasolt sorrendje: (1) HEMS vezérlés és adatgyűjtés, (2) Napelemes rendszer telepítés, (3) Akkumulátor-tárolás. Ez a fokozatosság lehetővé teszi a beruházási kockázat csökkentését és a felhasználók fokozatos habitusváltozásának támogatását.
