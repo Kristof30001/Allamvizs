@@ -39,18 +39,17 @@ A belső érvényességet főként az alábbi tényezők befolyásolják:
 A jelen konfiguráció gyors összehasonlítást céloz, ezért az eredmények rangsor-jellegű értelmezése megbízhatóbb, mint a finom abszolút különbségek túlinterpretálása.
 
 \section{Külső érvényesség (external validity)}
-A külső validitás jelenleg közepes erősségű, mivel:
+A külső validitás a jelenlegi fázisban kifejezetten magas, mivel a projekt teljesítette az eredetileg javasolt komplexitási szinteket:
 \begin{itemize}
-  \item a PV adatok valósak,
-  \item az árprofilok valós ENTSO-E forrásból származnak,
-  \item ugyanakkor a load profil döntően generált.
+  \item a PV adatok valós Huawei inverter-mérésekből származnak,
+  \item az árprofilok valós ENTSO-E day-ahead forrásból jönnek (romániai zóna),
+  \item a háztartási terhelés pedig a standard UCI Machine Learning Repository okosóra adatsorából (perces felbontásból órásra aggregálva) származik.
 \end{itemize}
 
-A gyakorlati általánosíthatóság javításához szükséges:
+A gyakorlati általánosíthatóság további javításához a jövőben már csak a következő pontok bevonása szükséges:
 \begin{enumerate}
-  \item mért háztartási load-idősorok bevonása,
-  \item több háztartás- és eszközkonfiguráció vizsgálata,
-  \item hosszabb időhorizontú (szezonális/éves) validáció.
+  \item több, egymástól eltérő profilú háztartás és speciális fogyasztók (pl. hőszivattyú, EV) párhuzamos vizsgálata,
+  \item hosszabb időhorizontú, megszakítás nélküli éves szimuláció futtatása.
 \end{enumerate}
 
 \section{Fenyegetések az érvényességre (threats to validity)}

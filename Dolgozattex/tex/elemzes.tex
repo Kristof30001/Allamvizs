@@ -140,42 +140,53 @@ A kísérleti eredmények és a piaci adatok alapján a következő javaslatok t
 Az implementáció javasolt sorrendje: (1) HEMS vezérlés és adatgyűjtés, (2) Napelemes rendszer telepítés, (3) Akkumulátor-tárolás. Ez a fokozatosság lehetővé teszi a beruházási kockázat csökkentését és a felhasználók fokozatos habitusváltozásának támogatását.
 
 \section{Kódbázis-alapú benchmark-értékelés}
-A jelenlegi projektállapotban a legfontosabb eredmények már nem csak a három klasszikus szcenárióból, hanem a real\_pv vs synthetic benchmarkból is származnak. Ez a futtatás 16 kiválasztott napot, 2 adatváltozatot (real PV és synthetic), 5 algoritmust és 2 ismétlést kombinál, vagyis összesen 320 algoritmusfuttatást értékel.
+A projekt legfontosabb eredményei a négy szcenáriót vizsgáló, valós és szintetikus adatokat kombináló (2x2) benchmarkból származnak. Ez a futtatás 16 kiválasztott napot, 4 adatváltozatot, 5 algoritmust és 2 ismétlést kombinál, vagyis \textbf{összesen 640 algoritmusfuttatást} értékel.
 
-Az összegzett eredményeket a következő táblázat foglalja össze, amely jól mutatja az algoritmusok minőség--sebesség kompromisszumát:
+Az összegzett eredményeket a \ref{tab:realpv_synth_summary}. táblázat foglalja össze, amely jól mutatja az algoritmusok minőség--sebesség kompromisszumát a különböző zajszintek mellett:
 
 \begin{table}[H]
 \centering
-\caption{A jelenlegi real\_pv vs synthetic benchmark fő eredményei}
+\caption{A 2x2-es benchmark fő eredményei (640 futtatás aggregációja)}
 \label{tab:realpv_synth_summary}
-\begin{tabular}{lcccc}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llccc}
 \toprule
-\textbf{Algoritmus} & \textbf{Adathalmaz} & \textbf{Átlagköltség} & \textbf{Gap \%} & \textbf{Átlagidő (s)} \\
+\textbf{Adathalmaz} & \textbf{Algoritmus} & \textbf{Átlagköltség (RON)} & \textbf{Gap \%} & \textbf{Győzelmi arány \%} \\
 \midrule
-GA (P=100) & real\_pv & 13.61 & 0.96 & 0.156 \\
-GA (P=50)  & real\_pv & 13.90 & 32.08 & 0.079 \\
-GWO        & real\_pv & 14.23 & 60.65 & 0.119 \\
-Hybrid     & real\_pv & 15.43 & 82.20 & 0.066 \\
-PSO        & real\_pv & 16.70 & 159.08 & 0.055 \\
+\multirow{5}{*}{\textbf{(1) Lab-ideális} (Synth PV + Synth Load)} 
+& \textbf{GA (P=100)} & \textbf{10.50} & \textbf{1.56} & \textbf{62.5} \\
+& GA (P=50) & 10.86 & 4.69 & 25.0 \\
+& GWO & 11.37 & 10.14 & 12.5 \\
+& Hybrid & 13.04 & 27.45 & 0.0 \\
+& PSO & 14.02 & 41.00 & 0.0 \\
 \midrule
-GA (P=100) & synthetic & 10.47 & 0.91 & 0.159 \\
-GA (P=50)  & synthetic & 10.84 & 4.25 & 0.080 \\
-GWO        & synthetic & 11.62 & 10.80 & 0.120 \\
-Hybrid     & synthetic & 12.98 & 28.15 & 0.067 \\
-PSO        & synthetic & 13.52 & 33.21 & 0.056 \\
+\multirow{5}{*}{\textbf{(2) Termelési zaj} (Real PV + Synth Load)} 
+& \textbf{GA (P=100)} & \textbf{13.61} & \textbf{0.96} & \textbf{62.5} \\
+& GA (P=50) & 13.90 & 32.08 & 18.8 \\
+& GWO & 14.23 & 60.65 & 18.8 \\
+& Hybrid & 15.43 & 82.20 & 0.0 \\
+& PSO & 16.70 & 159.08 & 0.0 \\
+\midrule
+\multirow{5}{*}{\textbf{(3) Fogyasztási zaj} (Synth PV + Real Load)} 
+& \textbf{GA (P=100)} & \textbf{7.76} & \textbf{2.73} & \textbf{62.5} \\
+& GA (P=50) & 7.96 & 3.72 & 31.2 \\
+& GWO & 8.77 & 13.15 & 6.2 \\
+& Hybrid & 9.79 & 23.30 & 0.0 \\
+& PSO & 11.14 & 45.33 & 0.0 \\
+\midrule
+\multirow{5}{*}{\textbf{(4) Valós világ} (Real PV + Real Load)} 
+& \textbf{GA (P=100)} & \textbf{10.80} & \textbf{1.97} & \textbf{50.0} \\
+& GA (P=50) & 11.13 & 5.24 & 31.2 \\
+& GWO & 11.64 & 17.29 & 18.8 \\
+& Hybrid & 13.17 & 44.28 & 0.0 \\
+& PSO & 13.92 & 72.32 & 0.0 \\
 \bottomrule
 \end{tabular}
+}
 \end{table}
 
-A táblázatból jól látszik, hogy a GA(P=100) mindkét adathalmazon a legkiegyensúlyozottabb megoldás: az átlagos költsége alacsony, a gap minimális, és a futási ideje még nem lépi túl drasztikusan a többi módszert. Ezzel szemben a PSO ugyan gyors, de a valós PV esetén a költségoldali teljesítménye jelentősen elmarad.
-
-A benchmark eredményei azt mutatják, hogy a valós PV-vel párosított napok nehezebb keresési környezetet jelentenek. Ezt az is alátámasztja, hogy a legjobb átlagköltség real\_pv esetén magasabb, mint a synthetic esetén, miközben a GA(P=100) mindkét adathalmazon megőrzi az első helyet az átlagos rés (gap) szerint. A részletes riport alapján:
-\begin{itemize}
-	\item real\_pv: GA(P=100) átlag gap = 0.96\%, győzelmi arány = 62.5\%,
-	\item synthetic: GA(P=100) átlag gap = 0.91\%, győzelmi arány = 75.0\%.
-\end{itemize}
-
-Ez két fontos következtetést enged meg. Egyrészt a GA(P=100) nem csak egyes napokon teljesít jól, hanem a profilok egészén stabil marad. Másrészt a synthetic adatokon valamivel erősebb a dominanciája, ami azt sugallja, hogy a valós PV-idősorok bevezetése valóban növeli a probléma nehézségét.
+A táblázatból egyértelműen látszik, hogy a \textbf{GA (P=100)} mind a négy adathalmazon robusztus maradt: az átlagos költsége és a gap \% értéke is konzisztensen a legjobb. Ugyanakkor a 4. forgatókönyvben (Valós világ), ahol mind a termelés, mind a fogyasztás magas zajszinttel rendelkezett, a GA(P=100) győzelmi aránya 62.5\%-ról 50.0\%-ra csökkent, ami jelzi a keresési tér drasztikus nehezedését. 
+A \textbf{PSO} a laboratóriumi körülmények között még elfogadható lemaradással futott, de a valós, zajos idősorok (különösen a valós PV) bevezetésekor a teljesítménye összeomlott (akár 159\%-os gap). Ez a benchmark validálja, hogy a valós adatok használata kritikus lépés a HEMS algoritmusok tesztelésében.
 
 \section{A bemeneti adatminőség hatása az optimalizációs teljesítményre}
 Az egyik legfontosabb mérnöki tanulság, hogy a valós PV-idősor nem csak "szebb bemenet", hanem ténylegesen módosítja az optimalizálási tájképet. A real\_pv futásokban a megoldások költségszórása és az algoritmusok közti gap különbsége nagyobb, vagyis a solvernek nem csupán a terhelés áthelyezését, hanem a napelemtermelés időbeli torzulásait is kezelnie kell.
