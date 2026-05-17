@@ -53,14 +53,12 @@ A gyakorlati általánosíthatóság további javításához a jövőben már cs
 \end{enumerate}
 
 \section{Fenyegetések az érvényességre (threats to validity)}
-\subsection{Adatminőségi kockázatok}
-Időbélyeg-inkonzisztencia, hiányos órák, forrásoldali formátumváltás mind torzíthatják a napi profilképzést. A fallback logika csökkenti a futásmegszakadás esélyét, de elemzési torzítást okozhat, ha túl gyakran aktiválódik.
-
-\subsection{Modellezési egyszerűsítések}
-A jelen célfüggvény még nem tartalmaz explicit akkumulátor-degradációs költséget, és a visszatáplálási ár egyszerűsített szorzóval modellezett. Ezek érdemi közelítések, de korlátozzák a gazdasági becslések pontosságát.
-
-\subsection{Algoritmikus torzítások}
-Kis futásszám mellett egy-egy szerencsés/unlucky seed túlreprezentálódhat. Ezért a jövőbeli, végleges összehasonlításban a futásszám növelése és bootstrap-alapú konfidencia-intervallumok alkalmazása ajánlott.
+A benchmark értelmezésénél három fő kockázati csoportot kell figyelembe venni:
+\begin{description}
+  \item[Adatminőségi kockázatok:] Időbélyeg-inkonzisztencia, hiányos órák vagy forrásoldali formátumváltás torzíthatják a napi profilképzést. A fallback logika csökkenti a futásmegszakadás esélyét, de elemzési torzítást okozhat, ha túl gyakran aktiválódik.
+  \item[Modellezési egyszerűsítések:] A jelen célfüggvény még nem tartalmaz explicit akkumulátor-degradációs költséget, és a visszatáplálási ár egyszerűsített szorzóval modellezett. Ezek érdemi közelítések, de korlátozzák a gazdasági becslések pontosságát.
+  \item[Algoritmikus torzítások:] Kis futásszám mellett egy-egy szerencsés vagy kedvezőtlen seed túlreprezentálódhat. Ezért a jövőbeli, végleges összehasonlításban a futásszám növelése és bootstrap-alapú konfidencia-intervallumok alkalmazása ajánlott.
+\end{description}
 
 \section{Javasolt validációs protokoll a következő iterációra}
 A következő fejlesztési körben célszerű standardizált validációs protokollt használni:

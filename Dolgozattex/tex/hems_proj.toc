@@ -1,0 +1,74 @@
+\select@language {hungarian} \contentsline {chapter}{\numberline {1}Bevezetés és Problémafelvetés}{2}{chapter.2}%
+\select@language {hungarian} \contentsline {section}{\numberline {1.1}A projekt célja}{2}{section.3}%
+\select@language {hungarian} \contentsline {section}{\numberline {1.2}A keresletoldali szabályozás (DSM) jelentősége}{2}{section.4}%
+\select@language {hungarian} \contentsline {section}{\numberline {1.3}Problémafelvetés és motiváció}{3}{section.5}%
+\select@language {hungarian} \contentsline {section}{\numberline {1.4}Kutatási célok és hozzájárulások}{3}{section.6}%
+\select@language {hungarian} \contentsline {section}{\numberline {1.5}Szakirodalmi áttekintés és kutatási rés (State of the Art)}{3}{section.7}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {1.5.1}Metaheurisztikák a keresletoldali szabályozásban (DSM)}{4}{subsection.8}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {1.5.2}Adatminőség és bemeneti realizmus a korábbi kutatásokban}{4}{subsection.9}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {1.5.3}A dolgozat által megcélzott kutatási rés (Research Gap)}{4}{subsection.10}%
+\select@language {hungarian} \contentsline {chapter}{\numberline {2}Irodalmi Attekintes es Fogalmi Alapok}{6}{chapter.11}%
+\select@language {hungarian} \contentsline {section}{\numberline {2.1}Irodalmi háttér}{6}{section.12}%
+\select@language {hungarian} \contentsline {section}{\numberline {2.2}Definicio: Peak-to-Average Ratio}{6}{section.13}%
+\select@language {hungarian} \contentsline {section}{\numberline {2.3}Optimalizálási modell és döntési változók}{7}{section.19}%
+\select@language {hungarian} \contentsline {section}{\numberline {2.4}Korlátok és büntetéses kezelés}{7}{section.22}%
+\select@language {hungarian} \contentsline {section}{\numberline {2.5}Vétel és visszatáplálás aszimmetriája}{8}{section.23}%
+\select@language {hungarian} \contentsline {chapter}{\numberline {3}Módszertan és Rendszerarchitektúra}{9}{chapter.24}%
+\select@language {hungarian} \contentsline {section}{\numberline {3.1}Rendszerblokkok és felelősségek}{9}{section.25}%
+\select@language {hungarian} \contentsline {section}{\numberline {3.2}Adatforrások és előfeldolgozás}{9}{section.26}%
+\select@language {hungarian} \contentsline {section}{\numberline {3.3}Profilépítés: A 2x2-es mátrix}{10}{section.29}%
+\select@language {hungarian} \contentsline {section}{\numberline {3.4}Optimalizálási ciklus és futásszám}{10}{section.30}%
+\select@language {hungarian} \contentsline {section}{\numberline {3.5}Kiértékelési mutatók}{10}{section.32}%
+\select@language {hungarian} \contentsline {section}{\numberline {3.6}Artefakt-alapú riportolás}{11}{section.34}%
+\select@language {hungarian} \contentsline {chapter}{\numberline {4}Alkalmazott Algoritmusok}{12}{chapter.35}%
+\select@language {hungarian} \contentsline {section}{\numberline {4.1}Genetikus Algoritmus (GA)}{12}{section.36}%
+\select@language {hungarian} \contentsline {section}{\numberline {4.2}Particle Swarm Optimization (PSO)}{12}{section.37}%
+\select@language {hungarian} \contentsline {section}{\numberline {4.3}Grey Wolf Optimizer (GWO)}{13}{section.40}%
+\select@language {hungarian} \contentsline {section}{\numberline {4.4}Hibrid GA-PSO}{13}{section.44}%
+\select@language {hungarian} \contentsline {section}{\numberline {4.5}Komplexitás és paraméterérzékenység}{13}{section.45}%
+\select@language {hungarian} \contentsline {section}{\numberline {4.6}Miért érdemes a jelenlegi HEMS-modellre építeni?}{14}{section.47}%
+\select@language {hungarian} \contentsline {section}{\numberline {4.7}A metaheurisztikák szerepe a terheléseltolásban}{15}{section.52}%
+\select@language {hungarian} \contentsline {chapter}{\numberline {5}Kísérleti Eredmények}{16}{chapter.53}%
+\select@language {hungarian} \contentsline {section}{\numberline {5.1}Kísérleti szcenáriók}{16}{section.54}%
+\select@language {hungarian} \contentsline {section}{\numberline {5.2}Téli szcenárió eredményei}{16}{section.55}%
+\select@language {hungarian} \contentsline {section}{\numberline {5.3}Nyári szcenárió eredményei}{17}{section.57}%
+\select@language {hungarian} \contentsline {section}{\numberline {5.4}Viharos/Borús szcenárió eredményei}{17}{section.59}%
+\select@language {hungarian} \contentsline {section}{\numberline {5.5}Eredmények elemzése}{18}{section.61}%
+\select@language {hungarian} \contentsline {section}{\numberline {5.6}Implementációs részletek}{18}{section.62}%
+\select@language {hungarian} \contentsline {section}{\numberline {5.7}Ábrák}{18}{section.76}%
+\select@language {hungarian} \contentsline {section}{\numberline {5.8}Frissített benchmark protokoll (real PV vs synthetic)}{19}{section.77}%
+\select@language {hungarian} \contentsline {section}{\numberline {5.9}Reprodukálhatóság és seedelési séma}{19}{section.79}%
+\select@language {hungarian} \contentsline {section}{\numberline {5.10}Kiértékelési metrikák a frissített pipeline-ban}{19}{section.82}%
+\select@language {hungarian} \contentsline {section}{\numberline {5.11}Érvényességi korlátok}{20}{section.84}%
+\select@language {hungarian} \contentsline {chapter}{\numberline {6}Következtetések és Ajánlások}{21}{chapter.85}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.1}Egy nap részletes esetelemzése}{21}{section.86}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.2}A 2x2-es kísérleti mátrix: robusztusság validálása}{22}{section.89}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {6.2.1}Motiváció}{22}{subsection.90}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {6.2.2}A 2x2-es mátrix tudományos értéke}{23}{subsection.96}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.3}Főbb megállapítások}{24}{section.97}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.4}Gazdasági megtérülés}{25}{section.98}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.5}Környezeti hatás}{25}{section.100}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.6}Jövőbeli kutatási irányok és fejlesztési lehetőségek}{25}{section.101}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.7}Implementációs ajánlások és gazdasági szempontok}{26}{section.102}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.8}Kódbázis-alapú benchmark-értékelés}{27}{section.103}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.9}A keresési tér matematikai anatómiája: felfedezés vs. kiaknázás}{28}{section.105}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {6.9.1}A zajos adatok hatása a keresési térre (Rugged Landscape)}{28}{subsection.106}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {6.9.2}A PSO korai konvergenciája}{28}{subsection.107}%
+\select@language {hungarian} \contentsline {subsection}{\numberline {6.9.3}A genetikus algoritmus robusztussága}{29}{subsection.109}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.10}A bemeneti adatminőség hatása az optimalizációs teljesítményre}{29}{section.110}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.11}Algoritmusok közötti gyakorlati különbségek}{30}{section.111}%
+\select@language {hungarian} \contentsline {section}{\numberline {6.12}A jelenlegi modell gyakorlati értéke}{30}{section.112}%
+\select@language {hungarian} \contentsline {chapter}{\numberline {7}Reprodukálhatóság és Érvényességi Korlátok}{31}{chapter.116}%
+\select@language {hungarian} \contentsline {section}{\numberline {7.1}Reprodukálhatósági alapelvek}{31}{section.117}%
+\select@language {hungarian} \contentsline {section}{\numberline {7.2}Futási környezet és artefaktok}{31}{section.121}%
+\select@language {hungarian} \contentsline {section}{\numberline {7.3}Belső érvényesség (internal validity)}{32}{section.122}%
+\select@language {hungarian} \contentsline {section}{\numberline {7.4}Külső érvényesség (external validity)}{32}{section.123}%
+\select@language {hungarian} \contentsline {section}{\numberline {7.5}Fenyegetések az érvényességre (threats to validity)}{33}{section.126}%
+\select@language {hungarian} \contentsline {section}{\numberline {7.6}Javasolt validációs protokoll a következő iterációra}{33}{section.127}%
+\select@language {hungarian} \contentsline {chapter}{\numberline {A}Fontosabb programkódok listája}{34}{appendix.133}%
+\select@language {hungarian} \contentsline {section}{\numberline {A.1}HEMS kódbázis}{34}{section.134}%
+\select@language {hungarian} \contentsline {section}{\numberline {A.2}Mintakódrészlet}{34}{section.135}%
+\select@language {hungarian} \contentsline {section}{\numberline {A.3}Futtatási architektúra (jelenlegi állapot)}{35}{section.192}%
+\select@language {hungarian} \contentsline {section}{\numberline {A.4}Modulszintű felelősségek}{36}{section.193}%
+\select@language {hungarian} \contentsline {section}{\numberline {A.5}Adat- és eredmény-artefaktok}{36}{section.194}%
+\select@language {hungarian} \contentsline {section}{\numberline {A.6}Reprodukálhatósági szempontok}{37}{section.195}%

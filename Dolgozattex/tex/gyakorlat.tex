@@ -89,7 +89,9 @@ class Hybrid(AlgorithmBase):
 \end{lstlisting}
 
 \section{Ábrák}
-A generált ábrák: \texttt{generated\_day\_*.png}, \texttt{results\_convergence\_*.png}, \texttt{results\_boxplot\_*.png} (winter, summer, cloudy). A konvergencia görbék mutatják a GA lassabb, de stabilabb, és a PSO gyors, de korai stagnálását; a boxplot-ok a 20 futás statisztikai eloszlását ábrázolják.
+\begin{sloppypar}\hbadness=10000
+A generált ábrák három fő csoportba rendeződnek: napi profilok, konvergenciagörbék és költségeloszlási boxplotok. Ezek fájlnévmintái rendre \texttt{generated\_day\_*.png}, \texttt{results\_convergence\_*.png} és \texttt{results\_boxplot\_*.png}. A téli, nyári és borús szcenáriók ábrái együtt mutatják a GA lassabb, de stabilabb konvergenciáját, valamint a PSO gyorsabb, de korábban stagnáló viselkedését.
+\end{sloppypar}
 
 \section{Frissített benchmark protokoll (real PV vs synthetic)}
 A projekt jelenlegi állapotában a klasszikus háromszcenáriós futtatás mellett egy új, nap-indexelt benchmark pipeline is működik, amely valós inverteres PV profilt és valós ENTSO-E day-ahead árakat használ. A benchmark fixen 16 reprezentatív napot vesz figyelembe, és minden napra két adatváltozatot épít:
@@ -105,7 +107,7 @@ N_{eval} = N_{days} \cdot N_{datasets} \cdot N_{replicas} \cdot N_{algorithms} \
 ahol a jelenlegi konfigurációban $N_{days}=16$, $N_{datasets}=2$, $N_{replicas}=1$, $N_{algorithms}=5$, $N_{runs}=2$, így $N_{eval}=320$.
 
 \section{Reprodukálhatóság és seedelési séma}
-A benchmark futás reprodukálhatóságát determinisztikus seedelés biztosítja. A nap- és ismétlésindexből stabil seed számolódik, emellett az algoritmusfuttatásokhoz profile- és algorithm-index alapú offset kerül hozzáadásra. Ez két célt szolgál:
+A benchmark futás reprodukálhatóságát determinisztikus seedelés biztosítja. A nap- és ismétlésindexből stabil seed számolódik, az algoritmusfuttatásokhoz pedig profil- és algoritmusindex alapú offset társul. Ez két célt szolgál:
 \begin{enumerate}
         \item ugyanazon konfiguráció esetén megismételhető eredmények,
         \item különböző profilok és algoritmusok közti véletlen-összefonódás csökkentése.

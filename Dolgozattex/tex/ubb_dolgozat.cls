@@ -112,18 +112,18 @@
       \vspace*{2mm}
       \fontsize{26}{28}\selectfont\@titleHU \par%
       \vspace*{10mm}
-      \pgfimage[width=7.5cm]{images/logo_ubb.pdf}
+      \noindent\makebox[\linewidth][c]{\includegraphics[width=7.4cm]{../images/logo_ubb.pdf}}
     \end{center}
     \vfill
     {\fontsize{16}{18}\selectfont\scshape\noindent%
-      \begin{minipage}[t]{0.6\linewidth}%
+      \begin{minipage}[t]{0.58\linewidth}%
       	\baselineskip 2ex \parskip 0.5ex
         \noindent T\'emavezet\H{o}:\vspace*{0.3cm}
         
         \@tutorHU
       \end{minipage}
       \hfill
-      \begin{minipage}[t]{0.4\linewidth}%
+      \begin{minipage}[t]{0.38\linewidth}%
         \raggedleft\noindent%
         \baselineskip 2ex \parskip 0.5ex
         Szerz\H{o}:\vspace*{0.3cm}
@@ -149,18 +149,18 @@
       \vspace*{2mm}
       \fontsize{26}{28}\selectfont\@titleEN \par%
       \vspace*{10mm}
-      \pgfimage[width=7.5cm]{images/logo_ubb.pdf}
+      \noindent\makebox[\linewidth][c]{\includegraphics[width=7.4cm]{../images/logo_ubb.pdf}}
     \end{center}
     \vfill
     {\fontsize{16}{18}\selectfont\scshape\noindent%
-      \begin{minipage}[t]{0.6\linewidth}%
+      \begin{minipage}[t]{0.58\linewidth}%
         \baselineskip 2ex \parskip 0.5ex
         \noindent Advisor:\vspace*{0.3cm}
         
         \@tutorEN
       \end{minipage}
       \hfill
-      \begin{minipage}[t]{0.4\linewidth}%
+      \begin{minipage}[t]{0.38\linewidth}%
         \raggedleft\noindent%
         \baselineskip 2ex \parskip 0.5ex
         Author:\vspace*{0.3cm}
@@ -187,18 +187,18 @@
       \vspace*{2mm}
       \fontsize{26}{28}\selectfont\@titleRO \par%
       \vspace*{10mm}
-      \pgfimage[width=7.5cm]{images/logo_ubb.pdf}
+      \noindent\makebox[\linewidth][c]{\includegraphics[width=7.4cm]{../images/logo_ubb.pdf}}
     \end{center}
     \vfill
     {\fontsize{16}{18}\selectfont\scshape\noindent%
-      \begin{minipage}[t]{0.6\linewidth}%
+      \begin{minipage}[t]{0.58\linewidth}%
 				\baselineskip 2ex \parskip 0.5ex
         \noindent Conduc\u{a}tor \c{s}tiin\c{t}ific:\vspace*{0.3cm}
         
         \@tutorRO
       \end{minipage}
       \hfill
-      \begin{minipage}[t]{0.4\linewidth}%
+      \begin{minipage}[t]{0.38\linewidth}%
         \raggedleft\noindent%
         \baselineskip 2ex \parskip 0.5ex
         Absolvent:\vspace*{0.3cm}
@@ -804,6 +804,9 @@
 
 %% MINTED
 
+\makeatletter
+\def\caption@documentclass{standard}
+\makeatother
 \RequirePackage[compatibility=false]{caption}
 \RequirePackage{subcaption}
 
@@ -817,7 +820,7 @@
 % a következő szükséges, hogy a minted együttműködjön a magyar babel-lel
 % ld. https://github.com/gpoore/minted/issues/158
 \makeatletter
-\minted@checkstyle{}
+\@ifundefined{minted@checkstyle}{}{\minted@checkstyle{}}
 \renewcommand{\fps@listing}{t}
 \SetupFloatingEnvironment{listing}{name=kódrészlet}
 \makeatother

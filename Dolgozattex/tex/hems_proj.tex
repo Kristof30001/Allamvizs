@@ -1,7 +1,11 @@
 \PassOptionsToPackage{final}{listings}
 \PassOptionsToPackage{table}{xcolor}
 
-\documentclass[final,12pt]{ubb_dolgozat}
+\makeatletter
+\def\input@path{{../}}
+\makeatother
+
+\documentclass[12pt]{ubb_dolgozat}
 \usepackage{definitions}
 
 \usepackage{amsmath,amssymb}
@@ -37,7 +41,7 @@
 \maketitle
 
 \begin{abstractEN}
-This report extends the HEMS optimization benchmark by integrating a 2x2 cross-validation matrix to assess algorithm robustness under various uncertainty levels. The optimization core evaluates nature-inspired metaheuristics (GA, PSO, GWO, Hybrid) using a highly realistic setup: real day-ahead electricity prices (ENTSO-E, RO zone), real PV generation profiles from a Huawei inverter, and real-world household consumption data from the UCI Machine Learning Repository. The updated pipeline executed 640 simulation runs, storing outputs in structured formats and generating comprehensive visual analytics. Results indicate that while algorithm ranking is scenario-dependent, the Genetic Algorithm (P=100) exhibits the highest robustness and stability in the fully realistic, dual-noise scenario.
+This report presents a reproducible benchmark for optimizing Home Energy Management Systems (HEMS) with nature-inspired metaheuristics. The main contribution is the integration of realistic input data on both sides of the energy balance: real day-ahead electricity prices from the ENTSO-E Romanian zone, measured PV generation profiles from a Huawei inverter, and household consumption profiles derived from the UCI Machine Learning Repository smart-meter dataset. To evaluate robustness rather than isolated performance, the study introduces a 2x2 cross-validation matrix that separates synthetic and real PV generation from synthetic and real household load. This design produces 640 algorithm runs across 16 representative days, four data-quality scenarios, five optimizer configurations, and repeated stochastic executions. The results show that input realism significantly changes the optimization landscape: algorithms that perform acceptably under synthetic assumptions can degrade under real PV and UCI-based load variability. Across the full matrix, GA (P=100) provides the most stable cost performance and the strongest robustness in the fully realistic dual-noise scenario, while faster methods such as PSO remain more sensitive to noisy input profiles.
 \end{abstractEN}
 
 { \baselineskip 3ex
@@ -59,7 +63,7 @@ This report extends the HEMS optimization benchmark by integrating a 2x2 cross-v
 \appendix
 \include{programok}
 
-\bibliographystyle{abbrvnat_hu}
-\bibliography{../dolgozat}
+\bibliographystyle{../abbrvnat_hu}
+\bibliography{dolgozat}
 
 \end{document}
