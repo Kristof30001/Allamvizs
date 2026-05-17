@@ -188,6 +188,27 @@ Az összegzett eredményeket a \ref{tab:realpv_synth_summary}. táblázat foglal
 A táblázatból egyértelműen látszik, hogy a \textbf{GA (P=100)} mind a négy adathalmazon robusztus maradt: az átlagos költsége és a gap \% értéke is konzisztensen a legjobb. Ugyanakkor a 4. forgatókönyvben (Valós világ), ahol mind a termelés, mind a fogyasztás magas zajszinttel rendelkezett, a GA(P=100) győzelmi aránya 62.5\%-ról 50.0\%-ra csökkent, ami jelzi a keresési tér drasztikus nehezedését. 
 A \textbf{PSO} a laboratóriumi körülmények között még elfogadható lemaradással futott, de a valós, zajos idősorok (különösen a valós PV) bevezetésekor a teljesítménye összeomlott (akár 159\%-os gap). Ez a benchmark validálja, hogy a valós adatok használata kritikus lépés a HEMS algoritmusok tesztelésében.
 
+\section{A keresési tér matematikai anatómiája: felfedezés vs. kiaknázás}
+
+A 640 futásos benchmark egyik legszembetűnőbb eredménye, hogy a PSO a szintetikus, laboratóriumi környezetben még versenyképes volt, azonban a valós fogyasztási adatok és a valós inverter-mérések együttes bevezetésekor a teljesítménye drasztikusan romlott. Ennek oka a megváltozott keresési tér topológiájában és a PSO belső frissítési mechanizmusában keresendő.
+
+\subsection{A zajos adatok hatása a keresési térre (Rugged Landscape)}
+A generált, szintetikus profilok folytonos, sima görbéket eredményeznek. Ezek a profilok a célfüggvény terét egy viszonylag jól strukturált, közel konvex jellegű térbe rendezik, ahol a globális optimum felé mutató irányok egyértelműbbek. Ezzel szemben a valós UCI-alapú fogyasztási adatok a háztartási gépek véletlenszerű bekapcsolásából származó hirtelen tüskéket, kiugrásokat és aszimmetriát visznek a bemenetbe. Ez a hatás a keresési teret rücskös, több lokális optimumot tartalmazó, nehezen bejárható tájjá alakítja.
+
+\subsection{A PSO korai konvergenciája}
+A PSO algoritmusban a részecskék sebességét a következő egyenlet határozza meg:
+\begin{equation}
+v_i^{t+1} = w \cdot v_i^t + c_1 \cdot r_1 \cdot (pbest_i - x_i^t) + c_2 \cdot r_2 \cdot (gbest - x_i^t)
+\end{equation}
+ahol $pbest_i$ a részecske saját eddigi legjobb pozíciója, a $gbest$ pedig a teljes raj által talált globális legjobb pozíció.
+
+Amennyiben a raj egy zajos idősor miatt egy hamis lokális optimumhoz vonzódik, a $gbest$ komponens gyorsan magához rántja a többi részecskét. Ezzel a diverzitás csökken, a sebességek lelassulnak, és a keresés korán stagnálhat. Ez a viselkedés különösen akkor jelenik meg, amikor a bemenet egyszerre tartalmaz termelési és fogyasztási zajt.
+
+\subsection{A genetikus algoritmus robusztussága}
+Ezzel szemben a genetikus algoritmus a mutációs operátor révén jobban fenntartja a populáció sokszínűségét. A véletlenszerű, gradiensfüggetlen ugrások segítenek abban, hogy az algoritmus ne ragadjon be tartósan egy lokális csapdába. A nagyobb populációméret és a mutáció együttese szélesebb térbejárást tesz lehetővé, ezért a GA különösen a valós, zajos környezetben bizonyult stabilabbnak.
+
+Ebből a benchmarkból az a mérnöki következtetés vonható le, hogy a HEMS-feladatoknál nem csak a gyors konvergencia, hanem a diverzitás fenntartása is kulcsfontosságú. A PSO gyorsasági előnye önmagában nem ellensúlyozza a zajos bemenetekre való érzékenységét, míg a GA kevésbé látványos, de tartósabban megbízható teljesítményt ad.
+
 \section{A bemeneti adatminőség hatása az optimalizációs teljesítményre}
 Az egyik legfontosabb mérnöki tanulság, hogy a valós PV-idősor nem csak "szebb bemenet", hanem ténylegesen módosítja az optimalizálási tájképet. A real\_pv futásokban a megoldások költségszórása és az algoritmusok közti gap különbsége nagyobb, vagyis a solvernek nem csupán a terhelés áthelyezését, hanem a napelemtermelés időbeli torzulásait is kezelnie kell.
 
