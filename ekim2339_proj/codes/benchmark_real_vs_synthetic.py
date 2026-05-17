@@ -276,14 +276,17 @@ def build_summary(raw_df):
 
 def to_markdown_report(summary_df, winners_df, raw_df):
     lines = []
-    lines.append("# Benchmark: valos PV vs szintetikus")
+    lines.append("# Benchmark: 2x2 Kiserleti Matrix")
     lines.append("")
     lines.append(f"- Kivalasztott napok: {len(SELECTED_DAYS)}")
     lines.append(f"- Terheles replikak/nap: {LOAD_REPLICAS}")
     lines.append(f"- Futas/algoritmus/profil: {RUNS_PER_PROFILE}")
     lines.append("")
 
-    for dataset in ["real_pv", "synthetic"]:
+    # Dinamikusan lekérjük az összes forgatókönyv nevét (mind a 4-et)
+    datasets = summary_df["dataset"].unique()
+
+    for dataset in datasets:
         lines.append(f"## {dataset}")
         sub = summary_df[summary_df["dataset"] == dataset].copy()
         sub = sub.sort_values("avg_gap_pct")
@@ -297,30 +300,21 @@ def to_markdown_report(summary_df, winners_df, raw_df):
                 f"{r['avg_gap_pct']:.2f} | {int(r['wins'])} | "
                 f"{r['win_rate_pct']:.1f} | {r['mean_runtime_s']:.3f} |"
             )
-
         lines.append("")
-
-    # Egyszeru konkluzio automatikusan
-    real_best = summary_df[summary_df["dataset"] == "real_pv"].sort_values("avg_gap_pct").iloc[0]
-    synth_best = summary_df[summary_df["dataset"] == "synthetic"].sort_values("avg_gap_pct").iloc[0]
 
     lines.append("## Konkluzio")
     lines.append("")
-    lines.append(
-        f"A valos PV adatokon a legstabilabb algoritmus: {real_best['algorithm']} "
-        f"(atlag gap: {real_best['avg_gap_pct']:.2f}%, gyozelmi arany: {real_best.get('win_rate_pct', 0.0):.1f}%)."
-    )
-    lines.append(
-        f"A teljesen szintetikus adatokon a legstabilabb algoritmus: {synth_best['algorithm']} "
-        f"(atlag gap: {synth_best['avg_gap_pct']:.2f}%, gyozelmi arany: {synth_best.get('win_rate_pct', 0.0):.1f}%)."
-    )
-
-    if real_best["algorithm"] == synth_best["algorithm"]:
-        lines.append("A ket adathalmazon ugyanaz a nyertes, ami jo generalizaciot jelez.")
-    else:
-        lines.append("A ket adathalmazon mas a nyertes, ez domain-fuggo viselkedest jelez.")
+    
+    # Kiírjuk minden eset nyertesét
+    for dataset in datasets:
+        best = summary_df[summary_df["dataset"] == dataset].sort_values("avg_gap_pct").iloc[0]
+        lines.append(
+            f"- **{dataset}** legjobbja: {best['algorithm']} "
+            f"(atlag gap: {best['avg_gap_pct']:.2f}%, gyozelmi arany: {best.get('win_rate_pct', 0.0):.1f}%)"
+        )
 
     n_rows = len(raw_df)
+    lines.append("")
     lines.append(f"A kiertékeles osszesen {n_rows} egyedi algoritmusfutast tartalmaz.")
 
     return "\n".join(lines)
@@ -491,7 +485,9 @@ def _plot_daily_best_cost_lines(raw_df, dataset, out_path):
 
 def plot_summary_charts(summary_df, raw_df, out_dir):
     generated = 0
-    for dataset in ["real_pv", "synthetic"]:
+    # Itt is dinamikusan végigmegyünk a 4 forgatókönyvön
+    datasets = summary_df["dataset"].unique()
+    for dataset in datasets:
         ok1 = _plot_metric_bar(
             summary_df,
             dataset,
@@ -638,7 +634,7 @@ def main():
     report_text = to_markdown_report(summary_df, winners_df, raw_df)
     report_path.write_text(report_text, encoding="utf-8")
 
-    day_load_map = build_real_day_load_map(real_profiles)
+    day_load_map = build_real_day_load_map(profiles)
     daily_plot_count = plot_daily_realpv_price(real_pv_map, day_price_map, day_load_map, dirs["plots_days"])
     summary_plot_count = plot_summary_charts(summary_df, raw_df, dirs["plots_summary"])
 
