@@ -37,7 +37,7 @@
 \maketitle
 
 \begin{abstractEN}
-This updated report extends the original HEMS benchmark by integrating real day-ahead electricity prices (ENTSO-E, RO zone), reorganizing experiment outputs, and adding richer visual analytics. The optimization core remains a comparative evaluation of nature-inspired metaheuristics (GA, PSO, GWO, Hybrid), while the input realism is improved through real PV day profiles and real hourly price signals. The updated pipeline stores outputs in structured folders (tables/reports/plots), generates day-level and summary PNG figures, and preserves reproducibility through fixed seeds. Results indicate that ranking remains scenario-dependent, but robustness conclusions are now better supported by clearer reporting artifacts. This document keeps the original thesis structure and adds a dedicated chapter summarizing modifications, current status, and immediate next steps.
+This report extends the HEMS optimization benchmark by integrating a 2x2 cross-validation matrix to assess algorithm robustness under various uncertainty levels. The optimization core evaluates nature-inspired metaheuristics (GA, PSO, GWO, Hybrid) using a highly realistic setup: real day-ahead electricity prices (ENTSO-E, RO zone), real PV generation profiles from a Huawei inverter, and real-world household consumption data from the UCI Machine Learning Repository. The updated pipeline executed 640 simulation runs, storing outputs in structured formats and generating comprehensive visual analytics. Results indicate that while algorithm ranking is scenario-dependent, the Genetic Algorithm (P=100) exhibits the highest robustness and stability in the fully realistic, dual-noise scenario.
 \end{abstractEN}
 
 { \baselineskip 3ex
@@ -54,7 +54,6 @@ This updated report extends the original HEMS benchmark by integrating real day-
 \include{elmelet}
 \include{gyakorlat}
 \include{elemzes}
-\include{frissites}
 \include{reprodukcio_validitas}
 
 \appendix
