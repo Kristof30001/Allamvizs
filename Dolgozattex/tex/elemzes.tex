@@ -214,6 +214,36 @@ Az egyik legfontosabb mérnöki tanulság, hogy a valós PV-idősor nem csak "sz
 
 A synthetic változat ezzel szemben kontrolláltabb környezetet ad: a termelés és fogyasztás generált, ezért a modell belső logikája jobban illeszkedik a keresési stratégiákhoz. Ez nem hibája a modellnek, hanem előnye a vizsgálatnak: így külön látszik, hogy mennyit veszít vagy nyer az algoritmus a bemeneti realizmus növelésével.
 
+\section{Akkumulátor-degradáció és a túlzott kiaknázás kezelése}
+
+A HEMS optimalizáció korai fázisában a kísérletek egy klasszikus metaheurisztikus jelenségre mutattak rá, amelyet a szakirodalom \textit{túlzott kiaknázásnak (over-exploitation)} nevez. Amikor az algoritmusok számára az akkumulátor használata gyakorlatilag költségmentes, a solver kizárólag a hálózati árszámla minimalizálására törekszik. Ennek következménye, hogy a gyorsan konvergáló módszerek, különösen a PSO és a hibrid eljárás, hajlamosak a mikrociklusok generálására: a tárolót rövid időközönként töltik és kisütik, miközben a valós pénzügyi nyereség alig néhány bani.
+
+\subsection{A mikrociklusok problémája}
+
+A valós ENTSO-E áradatok gyakran tartalmaznak minimális, 1--2 banis (0.01--0.02 RON) órás különbségeket. Ez a finom gradiens a célfüggvény szempontjából elegendő ahhoz, hogy a solver rövid távon profitábilisnak ítélje az akkumulátor ismételt mozgatását, noha ez üzemi oldalról indokolatlan. Egy körülbelül 18 000 RON értékű, nagyjából 6000 ciklusra tervezett 10 kWh-s akkumulátor esetén az elhasználódás költsége nagyságrendileg 0.15 RON/kWh energiamozgatásra becsülhető. Vagyis egy látszólag nyereséges, de valójában túl gyakori töltési-kisütési művelet könnyen negatív nettó hasznot eredményezhet.
+
+\subsection{A degradációs büntetőfüggvény bevezetése}
+
+A probléma kezelése érdekében a modell továbbfejlesztett változatában lineáris amortizációs költséget vezettünk be. Az új célfüggvény az adott nap teljes költségét az alábbi módon számítja:
+
+\begin{equation}
+C_{total} = \sum_{t=1}^{24} \left( P_{import}(t) \cdot p_{buy}(t) - P_{export}(t) \cdot p_{sell}(t) + \left| \Delta E_{batt}(t) \right| \cdot C_{deg} \right)
+\end{equation}
+
+Ahol:
+\begin{itemize}
+	\item $P_{import}(t)$ és $P_{export}(t)$ a hálózatból felvett és visszatáplált teljesítmény az adott $t$ órában,
+	\item $p_{buy}(t)$ és $p_{sell}(t)$ az ENTSO-E órás árai,
+	\item $\left| \Delta E_{batt}(t) \right|$ az akkumulátorba betöltött vagy onnan kivett energia abszolút értéke,
+	\item $C_{deg}$ a konstans degradációs költség, amelyet a modellben $0.15$ RON/kWh értékkel közelítettünk.
+\end{itemize}
+
+\subsection{Az optimalizációs stratégia átalakulása}
+
+A büntetőparaméter bevezetése látványosan átrendezte az algoritmusok viselkedését. A mikrociklusok eltűntek, és az optimalizáló csak akkor használta az akkumulátort, amikor a nappali völgyidőszak és az esti csúcsidőszak közötti árkülönbség valóban indokolta az energiatárolás igénybevételét. Ha az arbitrázs kisebb volt, mint a degradációs küszöb, a solver inkább pihentette az akkumulátort, így a költségminimalizálás mellett a rendszer élettartamát is óvta.
+
+Ez az apró módosítás mérnöki szempontból jelentős: a modell így már nem pusztán matematikailag optimális, hanem üzemeltetési oldalról is reálisabb válaszokat ad. A degradációs tag beépítése különösen fontos ott, ahol a döntéshozatal nem egyszeri optimumkeresés, hanem hosszú távú eszközhasználat és beruházás-védelem kérdése is.
+
 \section{Algoritmusok közötti gyakorlati különbségek}
 A projekt eredményei nem csak sorrendet, hanem szerepköröket is kijelölnek:
 \begin{itemize}

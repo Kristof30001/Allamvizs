@@ -1,5 +1,9 @@
 import numpy as np
 
+
+# Approximate battery degradation cost per moved kWh.
+DEGRADATION_COST_PER_KWH = 0.15
+
 class SmartHomeEnvironment:
     def __init__(self, load_profile, pv_profile, price_profile):
         self.load = load_profile
@@ -73,6 +77,8 @@ class SmartHomeEnvironment:
         
         for t in range(24):
             p_batt = x[t] # Akku teljesítmény
+            charge_amount = max(p_batt, 0.0)
+            discharge_amount = max(-p_batt, 0.0)
             
             # SOC frissítés
             next_soc = current_soc + p_batt
@@ -93,12 +99,17 @@ class SmartHomeEnvironment:
             
             # Energiamérleg: P_grid = Load - PV + Battery
             grid_power = total_load_at_t - self.pv[t] + p_batt
+            battery_energy_moved = abs(charge_amount) + abs(discharge_amount)
+            degradation_penalty = battery_energy_moved * DEGRADATION_COST_PER_KWH
             
             # Költségszámítás
             if grid_power > 0: # Vétel
-                cost += grid_power * self.price[t]
+                hourly_cost = grid_power * self.price[t]
             else: # Eladás (csökkentett áron)
-                cost += grid_power * (self.price[t] * 0.3)
+                hourly_cost = grid_power * (self.price[t] * 0.3)
+
+            hourly_cost += degradation_penalty
+            cost += hourly_cost
         
         # --- C. Fenntarthatóság ---
         # A nap végén az akku töltöttsége legyen közel a kezdetihez
