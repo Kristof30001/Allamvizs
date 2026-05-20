@@ -14,6 +14,7 @@ A reprodukálhatóság érdekében minden futás determinisztikus bázis-seeddel
 
 \section{Téli szcenárió eredményei}
 Az alapvonal (akku és időzítés nélkül) télen átlagosan \textbf{42.09 RON}/nap.
+A téli eredményeket a \ref{tab:winter_stats}. táblázat foglalja össze, amelyből jól látható a GWO kedvező átlagos teljesítménye.
 \begin{table}[H]
 \centering
 \caption{Téli szcenárió statisztikái (20 futás, 50/100-as populáció, 150 iteráció, globális seed: 42)}
@@ -33,6 +34,7 @@ Hybrid & 36.28 & \textbf{34.42} & 0.24 \\
 
 \section{Nyári szcenárió eredményei}
 Az alapvonal (akku és időzítés nélkül) nyáron átlagosan \textbf{12.48 RON}/nap.
+A nyári eredmények összegzése a \ref{tab:summer_stats}. táblázatban található.
 \begin{table}[H]
 \centering
 \caption{Nyári szcenárió statisztikái (20 futás, 50/100-as populáció, 150 iteráció, globális seed: 42)}
@@ -51,6 +53,7 @@ Hybrid & 5.88 & 4.93 & 0.25 \\
 \end{table}
 
 \section{Viharos/Borús szcenárió eredményei}
+A viharos/borús esetre vonatkozó összesített mutatókat a \ref{tab:cloudy_stats}. táblázat mutatja be.
 \begin{table}[H]
 \centering
 \caption{Viharos/Borús Nap szcenárió statisztikái (20 futás, 50/100-as populáció, 150 iteráció, globális seed: 42)}
@@ -88,7 +91,6 @@ class Hybrid(AlgorithmBase):
         # ... tovabbi lepesek
 \end{lstlisting}
 
-\section{Ábrák}
 \begin{sloppypar}\hbadness=10000
 A generált ábrák három fő csoportba rendeződnek: napi profilok, konvergenciagörbék és költségeloszlási boxplotok. Ezek fájlnévmintái rendre \texttt{generated\_day\_*.png}, \texttt{results\_convergence\_*.png} és \texttt{results\_boxplot\_*.png}. A téli, nyári és borús szcenáriók ábrái együtt mutatják a GA lassabb, de stabilabb konvergenciáját, valamint a PSO gyorsabb, de korábban stagnáló viselkedését.
 \end{sloppypar}

@@ -19,6 +19,8 @@ A \ref{fig:winter_day}. ábra a téli szcenárió egy tipikus napjának PV-terme
 \label{fig:winter_box}
 \end{figure}
 
+A költségeloszlást a \ref{fig:winter_box}. ábra mutatja, amely a szcenárió bizonytalanságát és az algoritmusok szórását szemlélteti.
+
 \section{A 2x2-es kísérleti mátrix: robusztusság validálása}
 \label{sec:matrix_2x2}
 
@@ -31,7 +33,7 @@ A korábbi szintetikus profil-alapú tesztelés biztosított egy "tiszta labork�
 	\item \textbf{Fogyasztási oldalon}: a valós háztartások sajátos, oft véletlenszerű fogyasztási szokásait (mikróhullámú sütő, mosógép, TV-ezés).
 \end{itemize}
 
-Ahhoz, hogy az algoritmusok \textit{generalizálhatóságát} is teszteljük, négy kombinációt érték el:
+Ahhoz, hogy az algoritmusok \textit{generalizálhatóságát} is teszteljük, négy kombinációt értékeltünk, amelyeket a \ref{tab:matrix_2x2}. táblázat foglal össze:
 
 \begin{table}[H]
 \centering
@@ -84,9 +86,12 @@ A mátrix konfigurációja:
 A kísérletek rávilágítottak a \textbf{szezonális különbségek} fontosságára. Nyáron az optimalizáció kulcsa a többlettermelés menedzselése (az akkumulátor töltése vagy visszatáplálás), míg télen a drága csúcsidőszaki fogyasztás minimalizálása a cél. A vizsgált három szcenárió (tél, nyár, borús) megfelelően lefedi a valós üzemeltetési körülményeket. Az \textbf{algoritmus választást} illetően megállapítható, hogy nincs egyetlen "legjobb" módszer. A GA (P=100) a komplex, változékony esetekben bizonyult robusztusnak, míg a GWO a szigorúbb korlátokkal terhelt téli környezetben működött hatékonyabban. Az \textbf{akkumulátor szerepe} különösen a borús tesztesetben mutatkozott meg, ahol kulcsfontosságúnak bizonyult a termelés ingadozásainak kisimításában. A \textbf{futási teljesítmény} tekintetében az algoritmusok 0.21 és 0.92 másodperc közötti idő alatt találtak megoldást; a PSO volt a leggyorsabb, de ez gyakran a megoldás minőségének rovására ment.
 
 \section{Gazdasági megtérülés}
+A beruházási és megtérülési becslést a \ref{tab:payback_estimate}. táblázat szemlélteti.
+
 \begin{table}[H]
 \centering
 \caption{Beruházási és megtérülési kalkuláció becslés}
+\label{tab:payback_estimate}
 \begin{tabular}{lc}
 \toprule
 \textbf{Tétel} & \textbf{Költség/Érték} \\

@@ -12,6 +12,28 @@ A genetikus algoritmusok alapötletét Holland klasszikus munkája alapozta meg 
 
 Az implementált algoritmus működése a következő lépésekből áll. Elsőként generálunk $N$ darab véletlen egyedet, amelyek a kezdeti populációt alkotják, majd minden egyedhez kiszámítjuk a költségfüggvény alapján a fitness értéket. Ezt követi a fő ciklus, amely $G$ generáción keresztül fut. Minden iterációban az elitizmus elve alapján a legjobb két egyed automatikusan továbbjut. A szülőket tournament módszerrel választjuk ki, majd aritmetikai átlagolással és zaj hozzáadásával keresztezzük őket. A sokszínűség fenntartása érdekében Gauss-eloszlású véletlen módosítással mutációt hajtunk végre. Végül az új populáció létrehozása és a határok ellenőrzése után az algoritmus visszatér a legjobb megoldással.
 
+Az alábbi pszeudókód a GA működését foglalja össze formális, algoritmikus alakban.
+
+\begin{algorithm}[H]
+\caption{Genetikus Algoritmus (GA) működési logikája}
+\label{alg:ga}
+\begin{algorithmic}[1]
+\State \textbf{Bemenet:} $P$ populációméret, $MaxIter$ maximális iterációszám, $p_m$ mutációs ráta, $p_c$ keresztezési ráta
+\State Kezdeti populáció generálása véletlenszerűen
+\State Célfüggvény (fitnesz) kiértékelése minden egyedre
+\State $iter \gets 0$
+\While{$iter < MaxIter$}
+	\State Szülők kiválasztása (rulettkerék módszerrel)
+	\State Keresztezés ($p_c$ valószínűséggel) az utódok létrehozására
+	\State Mutáció végrehajtása ($p_m$ valószínűséggel)
+	\State Új populáció fitneszének kiértékelése
+	\State Elitizmus: a legjobb egyedek átmásolása az új generációba
+	\State $iter \gets iter + 1$
+\EndWhile
+\State \textbf{Kimenet:} A legjobb talált megoldás (legkisebb költségű akkumulátor-ütemezés)
+\end{algorithmic}
+\end{algorithm}
+
 \section{Particle Swarm Optimization (PSO)}
 A PSO eredeti formáját Kennedy és Eberhart vezette be \cite{KennedyEberhartPSO1995}.
 Sebesség-frissítési egyenlet:
@@ -27,6 +49,35 @@ X_i^{k+1} = X_i^k + V_i^{k+1}
 Az \eqref{eq:pso_velocity} és \eqref{eq:pso_position} egyenletek adják a PSO alapdinamikáját.
 Előny: gyors, egyszerű. Hátrány: lokális optimumra hajlamos. Teljesítmény: $\approx$ 15--18\% költségcsökkenés.
 
+A következő pszeudókód a PSO iterációs logikáját mutatja be.
+
+\begin{algorithm}[H]
+\caption{Részecskeraj Optimalizáció (PSO) működési logikája}
+\label{alg:pso}
+\begin{algorithmic}[1]
+\State \textbf{Bemenet:} Raj mérete, $MaxIter$, $w$ inercia, $c_1, c_2$ gyorsulási együtthatók
+\State Részecskék pozíciójának ($x_i$) és sebességének ($v_i$) inicializálása
+\State Minden részecskére: $pbest_i \gets x_i$
+\State Globális legjobb megkeresése: $gbest$
+\State $iter \gets 0$
+\While{$iter < MaxIter$}
+	\For{minden $i$ részecskére}
+		\State $v_i \gets w \cdot v_i + c_1 \cdot r_1 \cdot (pbest_i - x_i) + c_2 \cdot r_2 \cdot (gbest - x_i)$
+		\State $x_i \gets x_i + v_i$
+		\State Új pozíció fitneszének kiértékelése
+		\If{fitnesz($x_i$) jobb, mint fitnesz($pbest_i$)}
+			\State $pbest_i \gets x_i$
+		\EndIf
+		\If{fitnesz($pbest_i$) jobb, mint fitnesz($gbest$)}
+			\State $gbest \gets pbest_i$
+		\EndIf
+	\EndFor
+	\State $iter \gets iter + 1$
+\EndWhile
+\State \textbf{Kimenet:} $gbest$ (a hálózat legalacsonyabb költségű pontja)
+\end{algorithmic}
+\end{algorithm}
+
 \section{Grey Wolf Optimizer (GWO)}
 A GWO algoritmust Mirjalili és szerzőtársai javasolták \cite{MirjaliliGWO2014}.
 
@@ -39,6 +90,31 @@ Pozíció-frissítés:
 \end{align}
 Előny: kevesebb paraméter, jobb exploration-exploitation egyensúly.
 Teljesítmény: $\approx$ 18--20\% költségcsökkenés.
+
+A GWO működését az alábbi pszeudókód összegzi.
+
+\begin{algorithm}[H]
+\caption{Szürke Farkas Optimalizáció (GWO) működési logikája}
+\label{alg:gwo}
+\begin{algorithmic}[1]
+\State \textbf{Bemenet:} Falka mérete, $MaxIter$
+\State Farkasok pozíciójának inicializálása véletlenszerűen
+\State Farkasok fitneszének kiértékelése
+\State A 3 legjobb megoldás kijelölése: $\alpha$ (alfa), $\beta$ (béta), $\delta$ (delta)
+\State $iter \gets 0$
+\While{$iter < MaxIter$}
+	\State Az $a$ paraméter lineáris csökkentése 2-ről 0-ra
+	\For{minden farkasra}
+		\State Távolság kiszámítása az $\alpha, \beta$ és $\delta$ vezérektől
+		\State Pozíció frissítése az $\alpha, \beta, \delta$ átlagolt irányvektora alapján
+	\EndFor
+	\State Új pozíciók fitneszének kiértékelése
+	\State Az $\alpha, \beta, \delta$ vezérek frissítése, ha jobb pozíciót találtak
+	\State $iter \gets iter + 1$
+\EndWhile
+\State \textbf{Kimenet:} Az $\alpha$ farkas pozíciója (optimális ütemezés)
+\end{algorithmic}
+\end{algorithm}
 
 \section{Hibrid GA-PSO}
 A GA és PSO kombinálása ismert hibridizációs irány \cite{KumarGA}.
