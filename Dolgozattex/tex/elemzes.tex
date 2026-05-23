@@ -5,6 +5,8 @@
 \section{Egy nap részletes esetelemzése}
 A \ref{fig:winter_day}. ábra a téli szcenárió egy tipikus napjának PV-termelés és fogyasztási profiljait mutatja. A \ref{tab:winter_stats}. táblázat eredményei alapján ebben a körülményben a GWO adta a legalacsonyabb átlagos költséget, ami összhangban van a szűkös termelési helyzettel.
 
+A különböző algoritmusok bemeneti profilját a \ref{fig:winter_day}. ábra, míg a költségeloszlást a \ref{fig:winter_box}. ábra szemlélteti.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{ekim2339_proj/generated_day_winter.png}
@@ -18,8 +20,6 @@ A \ref{fig:winter_day}. ábra a téli szcenárió egy tipikus napjának PV-terme
 \caption{Költség eloszlás a téli szcenárióban (20 futás)}
 \label{fig:winter_box}
 \end{figure}
-
-A költségeloszlást a \ref{fig:winter_box}. ábra mutatja, amely a szcenárió bizonytalanságát és az algoritmusok szórását szemlélteti.
 
 \section{A 2x2-es kísérleti mátrix: robusztusság validálása}
 \label{sec:matrix_2x2}
@@ -85,7 +85,7 @@ A mátrix konfigurációja:
 
 A kísérletek rávilágítottak a \textbf{szezonális különbségek} fontosságára. Nyáron az optimalizáció kulcsa a többlettermelés menedzselése (az akkumulátor töltése vagy visszatáplálás), míg télen a drága csúcsidőszaki fogyasztás minimalizálása a cél. A vizsgált három szcenárió (tél, nyár, borús) megfelelően lefedi a valós üzemeltetési körülményeket. Az \textbf{algoritmus választást} illetően megállapítható, hogy nincs egyetlen "legjobb" módszer. A GA (P=100) a komplex, változékony esetekben bizonyult robusztusnak, míg a GWO a szigorúbb korlátokkal terhelt téli környezetben működött hatékonyabban. Az \textbf{akkumulátor szerepe} különösen a borús tesztesetben mutatkozott meg, ahol kulcsfontosságúnak bizonyult a termelés ingadozásainak kisimításában. A \textbf{futási teljesítmény} tekintetében az algoritmusok 0.21 és 0.92 másodperc közötti idő alatt találtak megoldást; a PSO volt a leggyorsabb, de ez gyakran a megoldás minőségének rovására ment.
 
-\section{Gazdasági megtérülés}
+\textbf{Gazdasági megtérülés:}
 A beruházási és megtérülési becslést a \ref{tab:payback_estimate}. táblázat szemlélteti.
 
 \begin{table}[H]
@@ -111,10 +111,10 @@ HEMS hardver & $\approx$ 1200 RON \\
 \end{table}
 Támogatással (Casa Verde) a megtérülés 3--4 évre csökkenthető.
 
-\section{Környezeti hatás}
+\textbf{Környezeti hatás:}
 A rendszer környezeti hatása jelentős. Az évi 6000 kWh saját napelemes termelés önmagában mintegy 4.8 tonna CO$_2$ kiváltását eredményezi. Ehhez adódik hozzá a terhelés-eltolásból és a hatékonyságnövelésből származó további 2000 kWh megtakarítás, ami újabb 1.6 tonna kibocsátáscsökkenést jelent. \textcolor{red}{\textbf{Összességében így évente nagyságrendileg 6.4 tonna CO$_2$ megtakarítás érhető el.}}
 
-\section{Jövőbeli kutatási irányok és fejlesztési lehetőségek}
+\textbf{Jövőbeli kutatási irányok és fejlesztési lehetőségek:}
 
 A jelenlegi modell továbbfejlesztése több kritikus irányban is lehetséges, amelyek tovább növelhetik a HEMS rendszerek gazdasági és műszaki relevanciáját:
 
@@ -130,7 +130,7 @@ A jelenlegi modell továbbfejlesztése több kritikus irányban is lehetséges, 
 
 E kiterjesztések közül az LSTM-alapú előrejelzés és a V2G már ipari pilóta-projektekben is testesülnek meg (pl. Németország, Hollandia, Dánia), így az elméleti potenciál valósággá válásának az esélye magas.
 
-\section{Implementációs ajánlások és gazdasági szempontok}
+\textbf{Implementációs ajánlások és gazdasági szempontok:}
 
 A kísérleti eredmények és a piaci adatok alapján a következő javaslatok tehetők a különböző felhasználói csoportok számára:
 
@@ -144,7 +144,7 @@ A kísérleti eredmények és a piaci adatok alapján a következő javaslatok t
 
 Az implementáció javasolt sorrendje: (1) HEMS vezérlés és adatgyűjtés, (2) Napelemes rendszer telepítés, (3) Akkumulátor-tárolás. Ez a fokozatosság lehetővé teszi a beruházási kockázat csökkentését és a felhasználók fokozatos habitusváltozásának támogatását.
 
-\section{Kódbázis-alapú benchmark-értékelés}
+\textbf{Kódbázis-alapú benchmark-értékelés:}
 A projekt legfontosabb eredményei a négy szcenáriót vizsgáló, valós és szintetikus adatokat kombináló (2x2) benchmarkból származnak. Ez a futtatás 16 kiválasztott napot, 4 adatváltozatot, 5 algoritmust és 2 ismétlést kombinál, vagyis \textbf{összesen 640 algoritmusfuttatást} értékel.
 
 Az összegzett eredményeket a \ref{tab:realpv_synth_summary}. táblázat foglalja össze, amely jól mutatja az algoritmusok minőség--sebesség kompromisszumát a különböző zajszintek mellett:
