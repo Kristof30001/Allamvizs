@@ -1,0 +1,5 @@
+közben bele néztem egy picit a dolgozatba, még mindig túl sok az alfejezet
+pl ilyenre nincs szükség, hogy ábrák
+a táblázatokra meg a képekre is kell hivatkozás a szüvegben
+pl. a 3.2-es táblázatban látható bla bla bla
+és az algoritmusokat írd le pszeudókodban
