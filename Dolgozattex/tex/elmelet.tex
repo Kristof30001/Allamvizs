@@ -4,151 +4,67 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{osszefoglal}
-Négy metaheurisztikát és egy hibrid eljárást alkalmaztunk: GA, PSO, GWO és GA-PSO hibrid.
+Négy metaheurisztikát és egy hibrid eljárást alkalmaztunk: GA, PSO, GWO és GA-PSO hibrid. A fejezet bemutatja mindegyik algoritmus működési elvét, paraméterezését és a HEMS-feladatra való alkalmazhatóságát.
 \end{osszefoglal}
 
 \section{Genetikus Algoritmus (GA)}
-A genetikus algoritmusok alapötletét Holland klasszikus munkája alapozta meg \cite{HollandGA1975}. A módszer fő előnye, hogy jól kezeli a diszkrét változókat és robusztus megoldást nyújt \cite{HollandGA1975}, bár hátránya a lassabb konvergencia. A mérések alapján az algoritmus átlagosan 15--20\%-os költségcsökkenést eredményez.
 
-Az implementált algoritmus működése a következő lépésekből áll. Elsőként generálunk $N$ darab véletlen egyedet, amelyek a kezdeti populációt alkotják, majd minden egyedhez kiszámítjuk a költségfüggvény alapján a fitness értéket. Ezt követi a fő ciklus, amely $G$ generáción keresztül fut. Minden iterációban az elitizmus elve alapján a legjobb két egyed automatikusan továbbjut. A szülőket tournament módszerrel választjuk ki, majd aritmetikai átlagolással és zaj hozzáadásával keresztezzük őket. A sokszínűség fenntartása érdekében Gauss-eloszlású véletlen módosítással mutációt hajtunk végre. Végül az új populáció létrehozása és a határok ellenőrzése után az algoritmus visszatér a legjobb megoldással.
+A genetikus algoritmusok alapötletét Holland klasszikus munkája alapozta meg \cite{HollandGA1975}. A módszer a természetes szelekció elvét alkalmazza: egy populációnyi megoldásjelöltet tart fenn, amelyek generációról generációra fejlődnek keresztezés és mutáció révén. Fő előnye, hogy jól kezeli a diszkrét változókat és robusztus megoldást nyújt változékony keresési térben \cite{Ismail2014}, bár hátránya a PSO-hoz képest lassabb konvergencia.
 
-Az alábbi pszeudókód a GA működését foglalja össze formális, algoritmikus alakban.
-
-\begin{algorithm}[H]
-\caption{Genetikus Algoritmus (GA) működési logikája}
-\label{alg:ga}
-\begin{algorithmic}[1]
-\State \textbf{Bemenet:} $P$ populációméret, $MaxIter$ maximális iterációszám, $p_m$ mutációs ráta, $p_c$ keresztezési ráta
-\State Kezdeti populáció generálása véletlenszerűen
-\State Célfüggvény (fitnesz) kiértékelése minden egyedre
-\State $iter \gets 0$
-\While{$iter < MaxIter$}
-	\State Szülők kiválasztása (rulettkerék módszerrel)
-	\State Keresztezés ($p_c$ valószínűséggel) az utódok létrehozására
-	\State Mutáció végrehajtása ($p_m$ valószínűséggel)
-	\State Új populáció fitneszének kiértékelése
-	\State Elitizmus: a legjobb egyedek átmásolása az új generációba
-	\State $iter \gets iter + 1$
-\EndWhile
-\State \textbf{Kimenet:} A legjobb talált megoldás (legkisebb költségű akkumulátor-ütemezés)
-\end{algorithmic}
-\end{algorithm}
+Az implementált algoritmus működése a következő. Elsőként $N$ darab véletlen egyedet generálunk, amelyek a kezdeti populációt alkotják, majd minden egyedhez kiszámítjuk a fitness értéket a célfüggvény alapján. A fő ciklus $G$ generáción keresztül fut. Minden iterációban az elitizmus elve alapján a legjobb két egyed automatikusan továbbjut. A szülőket tournament módszerrel választjuk ki, majd aritmetikai átlagolással és zaj hozzáadásával keresztezzük őket. A sokszínűség fenntartása érdekében Gauss-eloszlású véletlen módosítással mutációt hajtunk végre, majd az algoritmus visszatér a legjobb megoldással. A mérések alapján az algoritmus átlagosan 15--20\%-os költségcsökkenést eredményez az optimalizálás nélküli alapvonalhoz képest.
 
 \section{Particle Swarm Optimization (PSO)}
-A PSO eredeti formáját Kennedy és Eberhart vezette be \cite{KennedyEberhartPSO1995}.
-Sebesség-frissítési egyenlet:
+
+A PSO eredeti formáját Kennedy és Eberhart vezette be 1995-ben, madárrajok és haliskolák kollektív viselkedésének modellezéséből kiindulva \cite{KennedyEberhartPSO1995}. Az algoritmus alapegysége a részecske (particle), amely egy lehetséges megoldást képvisel a keresési térben. Minden részecskének van egy aktuális pozíciója $\vec{x}_i$ és egy sebessége $\vec{v}_i$, amelyek iterációról iterációra frissülnek.
+
+A sebesség-frissítési egyenlet három tagból áll. Az első a tehetetlenségi tag, amely a részecske korábbi mozgásirányát tartja fenn: $w \cdot \vec{v}_i^k$. A második a kognitív tag, amely a részecske saját eddigi legjobb pozíciója ($\vec{p}_{best,i}$) felé húzza: $c_1 r_1 (\vec{p}_{best,i} - \vec{x}_i^k)$. A harmadik a szociális tag, amely a teljes raj által talált legjobb pozíció ($\vec{g}_{best}$) felé irányít: $c_2 r_2 (\vec{g}_{best} - \vec{x}_i^k)$. Összefoglalva:
 \begin{equation}
-V_i^{k+1} = w \cdot V_i^k + c_1 r_1 (P_{best,i} - X_i^k) + c_2 r_2 (G_{best} - X_i^k)
+\vec{v}_i^{k+1} = w \cdot \vec{v}_i^k + c_1 r_1 (\vec{p}_{best,i} - \vec{x}_i^k) + c_2 r_2 (\vec{g}_{best} - \vec{x}_i^k)
 \label{eq:pso_velocity}
 \end{equation}
-Pozíció-frissítés:
+ahol $r_1, r_2 \in [0,1]$ egyenletesen eloszló véletlen számok. A pozíció frissítése ezután:
 \begin{equation}
-X_i^{k+1} = X_i^k + V_i^{k+1}
+\vec{x}_i^{k+1} = \vec{x}_i^k + \vec{v}_i^{k+1}
 \label{eq:pso_position}
 \end{equation}
-Az \eqref{eq:pso_velocity} és \eqref{eq:pso_position} egyenletek adják a PSO alapdinamikáját.
-Előny: gyors, egyszerű. Hátrány: lokális optimumra hajlamos. Teljesítmény: $\approx$ 15--18\% költségcsökkenés.
 
-A következő pszeudókód a PSO iterációs logikáját mutatja be.
-
-\begin{algorithm}[H]
-\caption{Részecskeraj Optimalizáció (PSO) működési logikája}
-\label{alg:pso}
-\begin{algorithmic}[1]
-\State \textbf{Bemenet:} Raj mérete, $MaxIter$, $w$ inercia, $c_1, c_2$ gyorsulási együtthatók
-\State Részecskék pozíciójának ($x_i$) és sebességének ($v_i$) inicializálása
-\State Minden részecskére: $pbest_i \gets x_i$
-\State Globális legjobb megkeresése: $gbest$
-\State $iter \gets 0$
-\While{$iter < MaxIter$}
-	\For{minden $i$ részecskére}
-		\State $v_i \gets w \cdot v_i + c_1 \cdot r_1 \cdot (pbest_i - x_i) + c_2 \cdot r_2 \cdot (gbest - x_i)$
-		\State $x_i \gets x_i + v_i$
-		\State Új pozíció fitneszének kiértékelése
-		\If{fitnesz($x_i$) jobb, mint fitnesz($pbest_i$)}
-			\State $pbest_i \gets x_i$
-		\EndIf
-		\If{fitnesz($pbest_i$) jobb, mint fitnesz($gbest$)}
-			\State $gbest \gets pbest_i$
-		\EndIf
-	\EndFor
-	\State $iter \gets iter + 1$
-\EndWhile
-\State \textbf{Kimenet:} $gbest$ (a hálózat legalacsonyabb költségű pontja)
-\end{algorithmic}
-\end{algorithm}
+A tehetetlenségi súly $w$ szabályozza a globális és lokális keresés egyensúlyát: nagy $w$ értéknél a részecskék szélesebb területet pásztáznak (exploráció), kis $w$ értéknél pedig a már megtalált jó megoldások közelében finomhangolnak (exploitáció). A $c_1$ és $c_2$ kognitív és szociális gyorsulási konstansok azt szabályozzák, hogy a részecske mennyire bízik saját tapasztalatában versus a raj kollektív tudásában. A PSO előnye a gyors konvergencia és az egyszerű implementáció, hátránya azonban, hogy zajos keresési térben hajlamos hamis lokális optimumba ragadni, mivel a $\vec{g}_{best}$ komponens gyorsan magához vonzza az összes részecskét, csökkentve a populáció sokszínűségét.
 
 \section{Grey Wolf Optimizer (GWO)}
-A GWO algoritmust Mirjalili és szerzőtársai javasolták \cite{MirjaliliGWO2014}.
 
-Hierarchikus struktúra: $\alpha$, $\beta$, $\delta$, $\omega$.
-Pozíció-frissítés:
+A GWO algoritmust Mirjalili és szerzőtársai javasolták 2014-ben, a szürke farkasok hierarchikus csoportvadászatát modellezve \cite{MirjaliliGWO2014}. Az algoritmus négy rangszintet különböztet meg: az $\alpha$ farkas a legjobb megoldást képviseli, a $\beta$ a másodikat, a $\delta$ a harmadikat, az $\omega$ farkasok pedig a populáció többi tagját alkotják. Ez a hierarchia a keresés irányítási mechanizmusaként működik.
+
+Minden iterációban az $\alpha$, $\beta$ és $\delta$ farkasok pozíciója alapján frissül az összes többi egyed helyzete. Először meghatározzuk az egyes vezérfarkasokhoz való távolságot:
 \begin{align}
 \vec{D}_\alpha &= |\vec{C}_1 \cdot \vec{X}_\alpha - \vec{X}| \\
-\vec{X}_1 &= \vec{X}_\alpha - \vec{A}_1 \cdot \vec{D}_\alpha \\
-\vec{X}(t+1) &= \frac{\vec{X}_1 + \vec{X}_2 + \vec{X}_3}{3}
+\vec{D}_\beta  &= |\vec{C}_2 \cdot \vec{X}_\beta  - \vec{X}| \\
+\vec{D}_\delta &= |\vec{C}_3 \cdot \vec{X}_\delta - \vec{X}|
 \end{align}
-Előny: kevesebb paraméter, jobb exploration-exploitation egyensúly.
-Teljesítmény: $\approx$ 18--20\% költségcsökkenés.
+Ezután kiszámítjuk az egyes vezérek által javasolt új pozíciókat:
+\begin{align}
+\vec{X}_1 &= \vec{X}_\alpha - \vec{A}_1 \cdot \vec{D}_\alpha \\
+\vec{X}_2 &= \vec{X}_\beta  - \vec{A}_2 \cdot \vec{D}_\beta  \\
+\vec{X}_3 &= \vec{X}_\delta - \vec{A}_3 \cdot \vec{D}_\delta
+\end{align}
+Az egyед végső új pozícióját a három javaslat átlagaként kapjuk:
+\begin{equation}
+\vec{X}(t+1) = \frac{\vec{X}_1 + \vec{X}_2 + \vec{X}_3}{3}
+\end{equation}
 
-A GWO működését az alábbi pszeudókód összegzi.
-
-\begin{algorithm}[H]
-\caption{Szürke Farkas Optimalizáció (GWO) működési logikája}
-\label{alg:gwo}
-\begin{algorithmic}[1]
-\State \textbf{Bemenet:} Falka mérete, $MaxIter$
-\State Farkasok pozíciójának inicializálása véletlenszerűen
-\State Farkasok fitneszének kiértékelése
-\State A 3 legjobb megoldás kijelölése: $\alpha$ (alfa), $\beta$ (béta), $\delta$ (delta)
-\State $iter \gets 0$
-\While{$iter < MaxIter$}
-	\State Az $a$ paraméter lineáris csökkentése 2-ről 0-ra
-	\For{minden farkasra}
-		\State Távolság kiszámítása az $\alpha, \beta$ és $\delta$ vezérektől
-		\State Pozíció frissítése az $\alpha, \beta, \delta$ átlagolt irányvektora alapján
-	\EndFor
-	\State Új pozíciók fitneszének kiértékelése
-	\State Az $\alpha, \beta, \delta$ vezérek frissítése, ha jobb pozíciót találtak
-	\State $iter \gets iter + 1$
-\EndWhile
-\State \textbf{Kimenet:} Az $\alpha$ farkas pozíciója (optimális ütemezés)
-\end{algorithmic}
-\end{algorithm}
+Az $\vec{A}$ és $\vec{C}$ vektorok az iteráció előrehaladásával változnak: az $a$ paraméter lineárisan csökken 2-ről 0-ra, ami azt eredményezi, hogy a keresés kezdetben széles feltárást (exploráció), majd fokozatosan finomhangolást (exploitáció) végez. A GWO előnye, hogy kevés hangolható paramétert igényel és jól egyensúlyoz az exploráció és exploitáció között, különösen szűkebb, korlátosabb keresési terekben.
 
 \section{Hibrid GA-PSO}
-A GA és PSO kombinálása ismert hibridizációs irány \cite{KumarGA}.
 
-A hibridizáció logikája a két módszer erősségeit ötvözi: a keresés első fázisában a PSO végzi a gyors feltérképezést a sebesség-frissítési egyenletek segítségével. Ezt követően a GA veszi át az irányítást, amely keresztezéssel és mutációval biztosítja a megoldások diverzifikációját. A két fázis közötti váltás adaptív módon történik, így az algoritmus képes elkerülni a korai konvergenciát, elérve ezzel mintegy 18--22\%-os költségcsökkenést.
+A GA és PSO kombinálása ismert hibridizációs irány az energiarendszeres optimalizálásban \cite{KumarGA}. A hibrid algoritmus két egymást követő fázisban dolgozik. Az első fázisban -- az iterációk első 60\%-ában -- a PSO végzi a gyors feltérképezést a sebesség-frissítési egyenletek segítségével, kiaknázva a raj kollektív tudását. A második fázisban a GA veszi át az irányítást: a PSO által megtalált legjobb megoldás köré épített populációból indul ki, majd keresztezéssel és mutációval biztosítja a megoldások finomhangolását és a diverzitás fenntartását. A két fázis közötti váltásnál az úgynevezett seed injection technikát alkalmazzuk: a PSO legjobb megoldása bekerül a GA kiindulási populációjába, a populáció fele pedig annak véletlen perturbációiból áll, így a GA jó helyről indul, de elegendő variációja marad a további fejlődéshez.
 
 \section{Komplexitás és paraméterérzékenység}
-A vizsgált algoritmusok mindegyike populációalapú keresést végez, ezért a végrehajtási idő első közelítésben a populációméret ($N$), az iterációszám ($G$) és a döntési dimenzió ($d$) szorzatával arányos. A projekt jelenlegi problémájában $d=26$: 24 akkumulátorvezérlési változó és 2 eszközindítási idő szerepel a döntési vektorban. Így egy futás költsége érdemben így becsülhető:
+
+Valamennyi vizsgált algoritmus populációalapú keresést végez, ezért a végrehajtási idő első közelítésben a populációméret ($N$), az iterációszám ($G$) és a döntési dimenzió ($d$) szorzatával arányos. A projekt jelenlegi problémájában $d=26$: 24 akkumulátorvezérlési változó és 2 eszközindítási idő szerepel a döntési vektorban:
 \begin{equation}
 \mathcal{O}(N \cdot G \cdot d)
 \end{equation}
-
-Ez a becslés ugyan nem különíti el a célfüggvény részletes belső számításait, mégis jól mutatja, miért nő gyorsan a futási idő a populáció vagy az iteráció emelésével. A jelen benchmarkban ezért különösen fontos volt, hogy a GA(P=100) nem pusztán jobb átlagos minőséget adott, hanem elfogadható futási idő mellett tette ezt.
-
-Paraméterérzékenységi szempontból a következő megfigyelések adódnak a kód és az eredmények alapján:
-\begin{itemize}
-	\item a nagyobb populáció stabilabb keresést ad, de megnöveli a futási időt;
-	\item a PSO alacsony futási ideje mellett hajlamosabb korai stagnálásra;
-	\item a GWO kevés paraméterrel is erős baseline-t ad, különösen korlátozott keresési térben;
-	\item a hibrid modell csak akkor használja ki valóban az előnyeit, ha a PSO-fázis nem túl rövid, és a GA-fázis elegendő finomhangolási teret kap.
-\end{itemize}
-
-\section{Miért érdemes a jelenlegi HEMS-modellre építeni?}
-A HEMS optimalizálási probléma azért különösen alkalmas metaheurisztikák vizsgálatára, mert egyszerre tartalmaz:
-\begin{enumerate}
-	\item folytonos döntési változókat (akkumulátorteljesítmény),
-	\item diszkrét jellegű döntéseket (eszközök indítási ideje),
-	\item korlátokkal terhelt állapotdinamikát (SOC-határok),
-	\item nemlineáris és szcenáriófüggő célfüggvényt (ár, PV, load együtt).
-\end{enumerate}
-
-Ez a keverék indokolja, hogy a dolgozat nem egyetlen optimalizálási módszert, hanem több különböző keresési logikát hasonlít össze. A projekt jelenlegi formájában a legfontosabb kérdés nem az, hogy van-e egy abszolút mindenre legjobb algoritmus, hanem hogy melyik keresési stratégia milyen bemeneti realizmus mellett viselkedik stabilan.
+A paraméterérzékenységi vizsgálat alapján a nagyobb populáció stabilabb keresést ad, de megnöveli a futási időt. A PSO alacsony futási ideje mellett hajlamosabb korai stagnálásra zajos bemeneteken. A GWO kevés paraméterrel is erős kiindulópontot ad, különösen korlátozott keresési térben. A hibrid modell csak akkor használja ki valóban az előnyeit, ha a PSO-fázis nem túl rövid és a GA-fázis elegendő finomhangolási teret kap.
 
 \section{A metaheurisztikák szerepe a terheléseltolásban}
-A terheléseltolásos HEMS-feladatokban a keresés nem csak költségminimalizálásról szól, hanem a megvalósíthatóság és a működési komfort közti egyensúlyról is. A GA képes több, eltérő kezdetű megoldást fenntartani; a PSO gyorsan reagál a jobb egyedekre; a GWO kiegyensúlyozott, hierarchikus keresést biztosít; a hibrid pedig egyesíti a feltáró és finomító fázisokat.
 
-Az eredmények alapján különösen fontos tanulság, hogy a megoldás minősége nem lineárisan javul a futási idő növelésével. Egyes esetekben a gyors algoritmusok is elérnek jó lokális megoldásokat, de a nagyobb változékonyságú napokon a robusztusabb keresési stratégia válik előnyössé.
+A terheléseltolásos HEMS-feladatokban a keresés nem csak költségminimalizálásról szól, hanem a megvalósíthatóság és a működési komfort közti egyensúlyról is \cite{Fadaee2012}. A GA képes több, eltérő kezdetű megoldást fenntartani; a PSO gyorsan reagál a jobb egyedekre; a GWO kiegyensúlyozott, hierarchikus keresést biztosít; a hibrid pedig egyesíti a feltáró és finomító fázisokat. Az eredmények alapján különösen fontos tanulság, hogy a megoldás minősége nem lineárisan javul a futási idő növelésével -- egyes esetekben a gyors algoritmusok is elérnek jó lokális megoldásokat, de a nagyobb változékonyságú napokon a robusztusabb keresési stratégia válik előnyössé.

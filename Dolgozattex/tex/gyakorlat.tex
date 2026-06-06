@@ -4,17 +4,24 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{osszefoglal}
-Ez a fejezet két szintet fed le: (i) a klasszikus háromszcenáriós (tél/nyár/borús) eredményeket, valamint (ii) a jelenlegi, kódalapú \texttt{real\_pv vs synthetic} benchmark protokollt. A cél a korábbi eredmények megőrzése mellett a friss pipeline tudományos értelmezése.
+Ez a fejezet két szintet fed le: a klasszikus háromszcenáriós (tél/nyár/borús) eredményeket, valamint a 2×2-es kísérleti mátrix benchmark protokollt. A cél a korábbi eredmények megőrzése mellett a teljes pipeline tudományos értelmezése, beleértve az alkalmazott paramétereket is.
 \end{osszefoglal}
 
 \section{Kísérleti szcenáriók}
-A kísérleteket három, markánsan eltérő szcenárióban futtattuk le (20-20 alkalommal), hogy a rendszer robusztusságát vizsgáljuk. A \textbf{téli} esetet az alacsony PV termelés és a magasabb alapfogyasztás jellemzi, ami nagy hálózati függést eredményez. A \textbf{nyári} időszakban ezzel szemben magas, csúcsban akár 6 kW-os PV termeléssel és alacsonyabb fogyasztással számolhatunk, ami jelentős visszatáplálási potenciált rejt. Harmadikként egy \textbf{viharos/borús} (cloudy) napot szimuláltunk, ahol az ingadozó PV termelés és a magas zaj miatt az akkumulátor dinamikus kezelése válik szükségessé, ezáltal stressztesztnek vetve alá az algoritmusokat.
 
-A reprodukálhatóság érdekében minden futás determinisztikus bázis-seeddel (42) indul, amelyet a 20 ismétléshez futásonként eltoltunk. A nyers eredményeket és a futási idők listáit CSV/JSON formában mentettük a \texttt{results\_winter}, \texttt{results\_summer} és \texttt{results\_cloudy} fájlokba.
+A kísérleteket három, markánsan eltérő szcenárióban futtattuk le 20-20 alkalommal, hogy a rendszer robusztusságát vizsgáljuk. A téli esetet az alacsony PV termelés és a magasabb alapfogyasztás jellemzi, ami nagy hálózati függést eredményez. A nyári időszakban ezzel szemben magas, csúcsban akár 6 kW-os PV termeléssel és alacsonyabb fogyasztással számolhatunk, ami jelentős visszatáplálási potenciált rejt. Harmadikként egy viharos/borús napot szimuláltunk, ahol az ingadozó PV termelés és a magas zaj miatt az akkumulátor dinamikus kezelése válik szükségessé, ezáltal stressztesztnek vetve alá az algoritmusokat. A reprodukálhatóság érdekében minden futás determinisztikus bázis-seeddel (42) indul, amelyet a 20 ismétléshez futásonként eltoltunk, a nyers eredményeket és a futási idők listáit pedig CSV/JSON formában mentettük.
 
-\textbf{Téli szcenárió eredményei:}
+\section{Paraméterek beállítása}
+
+Az algoritmusok összehasonlíthatóságát egységes paraméterezési kerettel biztosítottuk. Minden algoritmus azonos populációméreten és iterációszámon futott: $N = 50$ (illetve GA esetén $N = 100$ a változat-összehasonlításhoz) és $G = 150$ iteráció. A döntési vektor dimenziója $d = 26$ volt minden esetben.
+
+A GA-nál a mutációs valószínűség $p_m = 0.1$, a keresztezés aritmetikai átlagolással történt, a szülőválasztás tournament szelekció (3 versenyző) alapján. Az elitizmus mértéke 2 egyed generációnként. A PSO-nál a tehetetlenségi súly $w = 0.6$, a kognitív gyorsulási konstans $c_1 = 1.8$, a szociális gyorsulási konstans $c_2 = 1.8$. A GWO-nál az $a$ paraméter lineárisan csökkent $2$-ről $0$-ra az iterációk során, más hangolható paraméter nem volt szükséges. A hibrid algoritmusnál a PSO-fázis az iterációk első $60\%$-át tette ki ($\lfloor 0.6 \cdot G \rfloor = 90$ iteráció), a GA-fázis a maradék $40\%$-ot ($60$ iteráció). A seed injection során a populáció fele a PSO legjobb megoldásának Gauss-perturbációiból ($\sigma = 0.5$) állt.
+
+Az akkumulátor modelljében a kapacitás $C_{batt} = 10$ kWh, a SOC-határok $[0.2, 0.9]$, a maximális töltési/kisütési teljesítmény $P_{max} = 3$ kW. A büntetési együtthatók $\lambda_{soc} = 5000$ és $\lambda_{end} = 2000$ voltak. A visszatáplálási ár az aktuális vételezési ár $30\%$-a.
+
+\section{Téli szcenárió eredményei}
+
 Az alapvonal (akku és időzítés nélkül) télen átlagosan \textbf{42.09 RON}/nap.
-A téli eredményeket a \ref{tab:winter_stats}. táblázat foglalja össze, amelyből jól látható a GWO kedvező átlagos teljesítménye.
 \begin{table}[H]
 \centering
 \caption{Téli szcenárió statisztikái (20 futás, 50/100-as populáció, 150 iteráció, globális seed: 42)}
@@ -23,18 +30,18 @@ A téli eredményeket a \ref{tab:winter_stats}. táblázat foglalja össze, amel
 \toprule
 \textbf{Algoritmus} & \textbf{Átlag költség} & \textbf{Legjobb futás} & \textbf{Átlagos idő (s)} \\
 \midrule
-GA (P=50) & 37.05 & 34.92 & 0.31 \\
+GA (P=50)  & 37.05 & 34.92 & 0.31 \\
 GA (P=100) & 37.25 & 35.06 & 0.62 \\
-PSO & 36.87 & 34.56 & 0.21 \\
-\textbf{GWO} & \textbf{35.40} & 33.91 & 0.44 \\
-Hybrid & 36.28 & \textbf{34.42} & 0.24 \\
+PSO        & 36.87 & 34.56 & 0.21 \\
+\textbf{GWO}    & \textbf{35.40} & 33.91 & 0.44 \\
+Hybrid     & 36.28 & \textbf{34.42} & 0.24 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Nyári szcenárió eredményei:}
+\section{Nyári szcenárió eredményei}
+
 Az alapvonal (akku és időzítés nélkül) nyáron átlagosan \textbf{12.48 RON}/nap.
-A nyári eredmények összegzése a \ref{tab:summer_stats}. táblázatban található.
 \begin{table}[H]
 \centering
 \caption{Nyári szcenárió statisztikái (20 futás, 50/100-as populáció, 150 iteráció, globális seed: 42)}
@@ -43,17 +50,17 @@ A nyári eredmények összegzése a \ref{tab:summer_stats}. táblázatban talál
 \toprule
 \textbf{Algoritmus} & \textbf{Átlag költség} & \textbf{Legjobb futás} & \textbf{Átlagos idő (s)} \\
 \midrule
-GA (P=50) & 4.08 & 3.74 & 0.31 \\
+GA (P=50)           & 4.08 & 3.74 & 0.31 \\
 \textbf{GA (P=100)} & \textbf{3.93} & \textbf{3.64} & 0.62 \\
-PSO & 6.67 & 5.20 & 0.20 \\
-GWO & 5.17 & 4.21 & 0.43 \\
-Hybrid & 5.88 & 4.93 & 0.25 \\
+PSO                 & 6.67 & 5.20 & 0.20 \\
+GWO                 & 5.17 & 4.21 & 0.43 \\
+Hybrid              & 5.88 & 4.93 & 0.25 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Viharos/Borús szcenárió eredményei:}
-A viharos/borús esetre vonatkozó összesített mutatókat a \ref{tab:cloudy_stats}. táblázat mutatja be.
+\section{Viharos/Borús szcenárió eredményei}
+
 \begin{table}[H]
 \centering
 \caption{Viharos/Borús Nap szcenárió statisztikái (20 futás, 50/100-as populáció, 150 iteráció, globális seed: 42)}
@@ -62,21 +69,23 @@ A viharos/borús esetre vonatkozó összesített mutatókat a \ref{tab:cloudy_st
 \toprule
 \textbf{Algoritmus} & \textbf{Átlag költség} & \textbf{Legjobb futás} & \textbf{Átlagos idő (s)} \\
 \midrule
-GA (P=50) & 14.13 & 13.58 & 0.31 \\
+GA (P=50)           & 14.13 & 13.58 & 0.31 \\
 \textbf{GA (P=100)} & \textbf{13.92} & \textbf{13.60} & 0.61 \\
-PSO & 17.08 & 14.07 & 0.20 \\
-GWO & 15.48 & 14.72 & 0.43 \\
-Hybrid & 16.19 & 14.50 & 0.25 \\
+PSO                 & 17.08 & 14.07 & 0.20 \\
+GWO                 & 15.48 & 14.72 & 0.43 \\
+Hybrid              & 16.19 & 14.50 & 0.25 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Eredmények elemzése:}
-Az eredmények elemzésekor erős szezonális hatást figyelhetünk meg: nyáron a magas napelem-termelésnek köszönhetően a napi költség drasztikusan, mintegy 67\%-kal csökkenthető (12.48 $\rightarrow$ 3.93 RON), míg télen a megtakarítás mértéke alacsonyabb, körülbelül 18\% (42.09 $\rightarrow$ 34.42 RON). A borús nap a kettő közötti átmenetet képezi. Az algoritmusok teljesítménye is eltérő: a GA (P=100) a komplex, változékony esetekben bizonyult a legrobusztusabbnak, míg a GWO télen, a szűkös erőforrások mellett adta a legjobb átlagot. A PSO gyorsasága ellenére nagy keresési térben hajlamos a beragadásra. A hibrid megoldás kiegyensúlyozott teljesítményt nyújtott, bár a többletidő nem minden esetben eredményezett jobb optimumot. A reprodukálhatóság érdekében minden tesztet 20 ismétléssel, determinisztikus seed használatával végeztünk, a futási idők 0.2 és 0.9 másodperc között alakultak.
+\section{Eredmények elemzése}
 
-\textbf{Implementációs részletek:}
-A hibrid megoldás PSO es GA fazisokra bontja az optimalizalast. A vezerlo logika egy reszlete a \ref{code:hybrid_snippet}. kodreszletben lathato.
-\begin{lstlisting}[language=Python, caption={A hibrid algoritmus vezerlo logikaja}, label=code:hybrid_snippet]
+Az eredmények elemzésekor erős szezonális hatást figyelhetünk meg. Nyáron a magas napelem-termelésnek köszönhetően a napi költség drasztikusan, mintegy 67\%-kal csökkenthető (12.48-ról 3.93 RON-ra), míg télen a megtakarítás mértéke alacsonyabb, körülbelül 18\% (42.09-ről 34.42 RON-ra). A borús nap a kettő közötti átmenetet képezi. Az algoritmusok teljesítménye is eltérő: a GA (P=100) a komplex, változékony esetekben bizonyult a legrobusztusabbnak, míg a GWO télen, a szűkös erőforrások mellett adta a legjobb átlagot. A PSO gyorsasága ellenére nagy keresési térben hajlamos beragadni, a hibrid megoldás pedig kiegyensúlyozott teljesítményt nyújtott, bár a többletidő nem minden esetben eredményezett jobb optimumot.
+
+\section{Implementációs részletek}
+
+A hibrid megoldás PSO és GA fázisokra bontja az optimalizálást. A vezérlő logika egy részlete a \ref{code:hybrid_snippet}.\ kódrészletben látható.
+\begin{lstlisting}[language=Python, caption={A hibrid algoritmus vezérlő logikája}, label=code:hybrid_snippet]
 class Hybrid(AlgorithmBase):
     def solve(self):
         # 1. fazis: PSO (felfedezes)
@@ -91,51 +100,63 @@ class Hybrid(AlgorithmBase):
         # ... tovabbi lepesek
 \end{lstlisting}
 
-\begin{sloppypar}\hbadness=10000
-A generált ábrák három fő csoportba rendeződnek: napi profilok, konvergenciagörbék és költségeloszlási boxplotok. Ezek fájlnévmintái rendre \texttt{generated\_day\_*.png}, \texttt{results\_convergence\_*.png} és \texttt{results\_boxplot\_*.png}. A téli, nyári és borús szcenáriók ábrái együtt mutatják a GA lassabb, de stabilabb konvergenciáját, valamint a PSO gyorsabb, de korábban stagnáló viselkedését.
-\end{sloppypar}
+\section{A 2×2-es benchmark protokoll}
 
-\textbf{Frissített benchmark protokoll (real PV vs synthetic):}
-A projekt jelenlegi állapotában a klasszikus háromszcenáriós futtatás mellett egy új, nap-indexelt benchmark pipeline is működik, amely valós inverteres PV profilt és valós ENTSO-E day-ahead árakat használ. A benchmark fixen 16 reprezentatív napot vesz figyelembe, és minden napra két adatváltozatot épít:
-\begin{itemize}
-        \item \texttt{real\_pv}: valós PV + generált load + valós/fallback ár,
-        \item \texttt{synthetic}: generált PV + generált load + valós/fallback ár.
-\end{itemize}
+A projekt jelenlegi állapotában a klasszikus háromszcenáriós futtatás mellett egy új, nap-indexelt benchmark pipeline is működik, amely valós inverteres PV profilt és valós ENTSO-E day-ahead árakat használ \cite{Ismail2014}. A benchmark fixen 16 reprezentatív napot vesz figyelembe, és minden napra két adatváltozatot épít: \texttt{real\_pv} (valós PV + generált load + valós/fallback ár) és \texttt{synthetic} (generált PV + generált load + valós/fallback ár). A teljes futásszám az előző fejezetben leírt $N_{eval} = 640$ algoritmusfuttatás.
 
-A teljes futásszám:
-\begin{equation}
-N_{eval} = N_{days} \cdot N_{datasets} \cdot N_{replicas} \cdot N_{algorithms} \cdot N_{runs}
-\end{equation}
-ahol a jelenlegi konfigurációban $N_{days}=16$, $N_{datasets}=2$, $N_{replicas}=1$, $N_{algorithms}=5$, $N_{runs}=2$, így $N_{eval}=320$.
+\section{A 2×2-es kísérleti mátrix eredményei}
 
-\textbf{Reprodukálhatóság és seedelési séma:}
-A benchmark futás reprodukálhatóságát determinisztikus seedelés biztosítja. A nap- és ismétlésindexből stabil seed számolódik, az algoritmusfuttatásokhoz pedig profil- és algoritmusindex alapú offset társul. Ez két célt szolgál:
-\begin{enumerate}
-        \item ugyanazon konfiguráció esetén megismételhető eredmények,
-        \item különböző profilok és algoritmusok közti véletlen-összefonódás csökkentése.
-\end{enumerate}
+Az összegzett eredményeket a \ref{tab:realpv_synth_summary}.\ táblázat foglalja össze, amely jól mutatja az algoritmusok minőség--sebesség kompromisszumát a különböző zajszintek mellett.
 
-\textbf{Kiértékelési metrikák a frissített pipeline-ban:}
-A nyers futásokból több aggregált mutató készül algoritmusonként és adathalmazonként:
-\begin{itemize}
-        \item átlagköltség és szórás ($mean\_cost$, $std\_cost$),
-        \item legjobb költség ($best\_cost$),
-        \item átlag futási idő ($mean\_runtime\_s$),
-        \item átlagos relatív rés a profilonkénti globális legjobbhoz képest ($avg\_gap\_pct$),
-        \item győzelmek száma és aránya ($wins$, $win\_rate\_pct$).
-\end{itemize}
+\begin{table}[H]
+\centering
+\caption{A 2×2-es benchmark fő eredményei (640 futtatás aggregációja)}
+\label{tab:realpv_synth_summary}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llccc}
+\toprule
+\textbf{Adathalmaz} & \textbf{Algoritmus} & \textbf{Átlagköltség (RON)} & \textbf{Gap \%} & \textbf{Győzelmi arány \%} \\
+\midrule
+\multirow{5}{*}{\textbf{(1) Lab-ideális}}
+& \textbf{GA (P=100)} & \textbf{10.50} & \textbf{1.56} & \textbf{62.5} \\
+& GA (P=50)  & 10.86 &  4.69 & 25.0 \\
+& GWO        & 11.37 & 10.14 & 12.5 \\
+& Hybrid     & 13.04 & 27.45 &  0.0 \\
+& PSO        & 14.02 & 41.00 &  0.0 \\
+\midrule
+\multirow{5}{*}{\textbf{(2) Termelési zaj}}
+& \textbf{GA (P=100)} & \textbf{13.61} &  \textbf{0.96} & \textbf{62.5} \\
+& GA (P=50)  & 13.90 & 32.08 & 18.8 \\
+& GWO        & 14.23 & 60.65 & 18.8 \\
+& Hybrid     & 15.43 & 82.20 &  0.0 \\
+& PSO        & 16.70 &159.08 &  0.0 \\
+\midrule
+\multirow{5}{*}{\textbf{(3) Fogyasztási zaj}}
+& \textbf{GA (P=100)} &  \textbf{7.76} &  \textbf{2.73} & \textbf{62.5} \\
+& GA (P=50)  &  7.96 &  3.72 & 31.2 \\
+& GWO        &  8.77 & 13.15 &  6.2 \\
+& Hybrid     &  9.79 & 23.30 &  0.0 \\
+& PSO        & 11.14 & 45.33 &  0.0 \\
+\midrule
+\multirow{5}{*}{\textbf{(4) Valós világ}}
+& \textbf{GA (P=100)} & \textbf{10.80} &  \textbf{1.97} & \textbf{50.0} \\
+& GA (P=50)  & 11.13 &  5.24 & 31.2 \\
+& GWO        & 11.64 & 17.29 & 18.8 \\
+& Hybrid     & 13.17 & 44.28 &  0.0 \\
+& PSO        & 13.92 & 72.32 &  0.0 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
 
-A profil-szintű gap definíciója:
-\begin{equation}
-gap_{i,a}[\%] = \frac{cost^{best}_{i,a} - cost^{best}_{i,*}}{|cost^{best}_{i,*}| + \varepsilon} \cdot 100
-\end{equation}
-ahol $i$ a profil, $a$ az algoritmus, $cost^{best}_{i,*}$ pedig az adott profilon elért legjobb algoritmus-költség.
+A táblázatból egyértelműen látszik, hogy a GA (P=100) mind a négy adathalmazon robusztus maradt: az átlagos költsége és a gap\% értéke is konzisztensen a legjobb. A negyedik forgatókönyvben, ahol mind a termelés, mind a fogyasztás magas zajszinttel rendelkezett, a GA(P=100) győzelmi aránya 62.5\%-ról 50.0\%-ra csökkent, ami jelzi a keresési tér drasztikus nehezedését. A PSO a laboratóriumi körülmények között még elfogadható lemaradással futott, de a valós, zajos idősorok bevezetésekor a teljesítménye összeomlott -- a valós PV esetén akár 159\%-os gap-et is elért. Ez a benchmark megerősíti, hogy a valós adatok használata kritikus lépés a HEMS algoritmusok tesztelésében.
 
-\textbf{Érvényességi korlátok:}
-A jelenlegi benchmark erős összehasonlító alapot ad, de a következő korlátok tudatosan kezelendők:
-\begin{itemize}
-        \item a load profilok jelenleg generáltak, nem mért háztartási idősorok,
-        \item a futásszám (2) gyors iterációra optimalizált, nem végleges statisztikai mélységre,
-        \item az akkumulátor degradáció még nincs expliciten beárazva a célfüggvénybe.
-\end{itemize}
-Ezek miatt a riportban szereplő rangsorok megbízható mérnöki indikátorok, de a végleges tudományos következtetésekhez érzékenységvizsgálat és bővített adatkészlet szükséges.
+\section{A keresési tér és az algoritmusok viselkedése}
+
+A 640 futásos benchmark egyik legszembetűnőbb eredménye, hogy a PSO szintetikus, laboratóriumi környezetben még versenyképes volt, azonban a valós fogyasztási adatok és a valós inverter-mérések együttes bevezetésekor a teljesítménye drasztikusan romlott. A generált, szintetikus profilok folytonos, sima görbéket eredményeznek, amelyek a célfüggvény terét egy viszonylag jól strukturált, közel konvex jellegű térbe rendezik. Ezzel szemben a valós UCI-alapú fogyasztási adatok a háztartási gépek véletlenszerű bekapcsolásából származó hirtelen tüskéket és aszimmetriát visznek a bemenetbe, ami a keresési teret rücskössé, több lokális optimumot tartalmazóvá alakítja.
+
+A PSO-ban, ha a raj egy zajos idősor miatt egy hamis lokális optimumhoz vonzódik, a $\vec{g}_{best}$ komponens gyorsan magához rántja a többi részecskét, csökkentve a diverzitást és stagnálást okozva. A genetikus algoritmus ezzel szemben a mutációs operátor révén jobban fenntartja a populáció sokszínűségét: a véletlenszerű, gradiensfüggetlen ugrások segítenek abban, hogy az algoritmus ne ragadjon be tartósan egy lokális csapdába. Ebből az a mérnöki következtetés vonható le, hogy a HEMS-feladatoknál nem csak a gyors konvergencia, hanem a diverzitás fenntartása is kulcsfontosságú.
+
+\section{Érvényességi korlátok}
+
+A jelenlegi benchmark erős összehasonlító alapot ad, de néhány korlát tudatosan kezelendő. A futásszám (2 futás/profil) gyors iterációra optimalizált, nem végleges statisztikai mélységre, ezért a rangsorok megbízható mérnöki indikátorok, de végleges tudományos következtetésekhez érzékenységvizsgálat és bővebb adatkészlet szükséges. Az akkumulátor degradáció jelenleg nincs expliciten beárazva a célfüggvénybe, ami a gazdasági becslések pontosságát korlátozza.

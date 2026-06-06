@@ -1,0 +1,46 @@
+%!TEX root = hems_proj.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Következtetések és További Célok}\label{ch:KOVETK}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{osszefoglal}
+A fejezet összefoglalja a kísérletek fő tanulságait, értékeli a modell gyakorlati jelentőségét, és körvonalazza a lehetséges fejlesztési irányokat.
+\end{osszefoglal}
+
+\section{Főbb megállapítások}
+
+A kísérletek rávilágítottak a szezonális különbségek fontosságára: nyáron az optimalizáció kulcsa a többlettermelés menedzselése, míg télen a drága csúcsidőszaki fogyasztás minimalizálása a cél. Az algoritmus-összehasonlítás alapján megállapítható, hogy nincs egyetlen abszolút legjobb módszer -- a GA (P=100) a komplex, változékony esetekben bizonyult a legrobusztusabbnak, míg a GWO a szigorúbb korlátokkal terhelt téli környezetben működött hatékonyabban. A PSO gyorsasági előnye önmagában nem ellensúlyozza a zajos bemenetekre való érzékenységét, míg a GA kevésbé látványos, de tartósabban megbízható teljesítményt ad.
+
+A 2×2-es benchmark egyik legfontosabb mérnöki tanulsága, hogy a valós PV-idősor és a valós háztartási fogyasztás együttes alkalmazása ténylegesen módosítja az optimalizálási tájképet. A szintetikus változat kontrolláltabb környezetet ad, ahol a modell belső logikája jobban illeszkedik a keresési stratégiákhoz -- ez nem hibája a modellnek, hanem előnye a vizsgálatnak, mert így külön látszik, hogy mennyit veszít vagy nyer az algoritmus a bemeneti realizmus növelésével.
+
+\section{Gazdasági és környezeti értékelés}
+
+A rendszer gazdasági megtérülése becsülhető, bár a pontos számok erősen függnek a konkrét helyszíntől, a telepített kapacitástól és az aktuális energiaáraktól. Az alábbi táblázatban szereplő értékek egy tipikus romániai háztartásra vonatkozó, irodalmi adatok és az ENTSO-E árprofilok alapján készített becslést tükröznek \cite{Fadaee2012}, nem a szimulációból közvetlenül kiszámított értékeket.
+
+\begin{table}[H]
+\centering
+\caption{Beruházási és megtérülési kalkuláció becslés (irodalmi adatok alapján)}
+\begin{tabular}{lc}
+\toprule
+\textbf{Tétel} & \textbf{Költség/Érték} \\
+\midrule
+HEMS hardver & $\approx$ 1200 RON \\
+5 kWp napelem rendszer & $\approx$ 15000 RON \\
+10 kWh akkumulátor & $\approx$ 18000 RON \\
+\midrule
+\textbf{Teljes beruházás} & \textbf{$\approx$ 34200 RON} \\
+\midrule
+Éves megtakarítás (becsült) & $\approx$ 6200 RON \\
+\midrule
+\textbf{Megtérülési idő} & \textbf{$\approx$ 5.5 év} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Támogatással (Casa Verde program) a megtérülés 3--4 évre csökkenthető. Környezeti szempontból az évi 6000 kWh saját napelemes termelés mintegy 4.8 tonna CO$_2$ kiváltását eredményezi, amihez a terhelés-eltolásból és a hatékonyságnövelésből származó további megtakarítás is hozzáadódik.
+
+\section{A jelenlegi modell értékelése és fejlesztési lehetőségek}
+
+A modell még nem végleges ipari rendszer, de tudományos és mérnöki szempontból értékes: valós árinformációt használ, elkülöníti a bemeneti realizmus és az algoritmikus teljesítmény hatását, és az eredmények visszakereshetők a mentett nyers mérési sorokon keresztül.
+
+A jövőbeli fejlesztések több irányba is mutatnak. Az akkumulátor degradációs költségének explicit beépítése a célfüggvénybe pontosabb gazdasági becsléseket tenne lehetővé, és várhatóan módosítaná az algoritmusok által preferált töltési stratégiákat is. A futásszám növelése és bootstrap-alapú konfidencia-intervallumok alkalmazása statisztikailag megalapozottabb összehasonlítást biztosítana. Hosszabb távon az elektromos járművek V2G (Vehicle-to-Grid) integrációja jelentősen növelné a tárolási kapacitást, a Peer-to-Peer energia-kereskedelem bevonása pedig közösségi szinten is értelmezhetővé tenné az optimalizálást. LSTM-alapú időjárás-előrejelzés beépítésével a prediktív vezérlés is megvalósíthatóvá válna, ami a jelenlegi reaktív ütemezéssel szemben proaktív stratégiákat tenne lehetővé.

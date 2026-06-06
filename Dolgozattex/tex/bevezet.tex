@@ -4,40 +4,35 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{osszefoglal}
-A fejezet bemutatja a HEMS célját és a keresletoldali szabályozás jelentőségét.
+A fejezet bemutatja a HEMS optimalizálás motivációját, a keresletoldali szabályozás jelentőségét, valamint a dolgozat kutatási céljait és a kapcsolódó szakirodalmi hátteret.
 \end{osszefoglal}
 
-A globális energetikai átalakulás, a decentralizált termelés térnyerése és a fenntarthatósági elvárások a Smart Grid technológiák felé terelik a villamosenergia-hálózatokat. A HEMS kulcsszereplő a lakossági oldalon: kétirányú kommunikációt és energiaáramlást kezel, összehangolja a fogyasztókat, tárolást és megújuló termelést.
-
-\section{A projekt célja}
-A projekt elsődleges célja egy olyan HEMS optimalizálási modell kidolgozása, amely képes a háztartási eszközök összehangolt vezérlésére és a megújuló források optimális kihasználására. A rendszer emellett biztosítja az energiatárolók intelligens irányítását, miközben minimalizálja a villamosenergia-költséget. Fontos szempont továbbá a hálózati terhelési csúcsok csökkentése (PAR redukció) a felhasználói komfort biztosítása mellett.
+A globális energetikai átalakulás, a decentralizált termelés térnyerése és a fenntarthatósági elvárások a Smart Grid technológiák felé terelik a villamosenergia-hálózatokat. Ebben a kontextusban a HEMS (Home Energy Management System) a lakossági energiafelhasználás intelligens koordinálását végzi: kétirányú kommunikációt és energiaáramlást kezel, összehangolja a fogyasztókat, a tárolást és a megújuló termelést.
 
 \section{A keresletoldali szabályozás (DSM) jelentősége}
-A terheléseltolás (Load Shifting) számos előnnyel jár \cite{Fadaee2012}. A legfontosabb a közvetlen, akár 20--40\%-os költségmegtakarítás, de emellett hozzájárul a hálózati csúcsok csökkentéséhez is. Szélesebb körben alkalmazva mérsékli a fosszilis erőművek igénybevételét, ezáltal pedig csökkenti a károsanyag-kibocsátást.
+
+A terheléseltolás (Load Shifting) a keresletoldali szabályozás egyik legfontosabb eszköze \cite{Fadaee2012}. Lényege, hogy a rugalmasan időzíthető fogyasztókat -- például mosógépet vagy mosogatógépet -- az olcsóbb, völgyidőszaki tarifasávba helyezi át, ezzel közvetlen, akár 20--40\%-os költségmegtakarítást érve el. Emellett hozzájárul a hálózati csúcsok csökkentéséhez és a fosszilis erőművek igénybevételének mérsékléséhez, ami végső soron a károsanyag-kibocsátást is csökkenti.
 
 \section{Problémafelvetés és motiváció}
-A HEMS optimalizálás a gyakorlatban több, egymással versengő cél kezelését jelenti: a költség minimalizálását, a felhasználói komfort fenntartását és a hálózati terhelés csökkentését. A lakossági szektorban a fogyasztás időben erősen ingadozó, míg a napelemes termelés időjárásfüggő és bizonytalan. Ezért a feladat nem egyszerű ütemezési probléma, hanem korlátokkal terhelt, vegyes (diszkrét és folytonos) döntési változókat tartalmazó optimalizációs modellként kezelhető \cite{Ismail2014,Fadaee2012}. A téma aktualitását jelzi a megújuló kapacitások növekedése és a dinamikus tarifák terjedése, amelyek a fogyasztói oldalon rugalmas szabályozást tesznek lehetővé. További háttérként lásd az \href{https://energy.ec.europa.eu}{európai energiapolitikai összefoglalót}.
+
+A HEMS optimalizálás a gyakorlatban több, egymással versengő cél egyidejű kezelését jelenti: a költség minimalizálását, a felhasználói komfort fenntartását és a hálózati terhelés csökkentését. A lakossági szektorban a fogyasztás időben erősen ingadozó, míg a napelemes termelés időjárásfüggő és bizonytalan. Ezért a feladat nem egyszerű ütemezési probléma, hanem korlátokkal terhelt, vegyes -- diszkrét és folytonos -- döntési változókat tartalmazó optimalizációs modellként kezelhető \cite{Ismail2014, Fadaee2012}. A téma aktualitását jelzi a megújuló kapacitások növekedése és a dinamikus tarifák terjedése, amelyek a fogyasztói oldalon rugalmas szabályozást tesznek lehetővé. További háttérként lásd az \href{https://energy.ec.europa.eu}{európai energiapolitikai összefoglalót}.
 
 \section{Kutatási célok és hozzájárulások}
-A dolgozat célja egy olyan optimalizációs keret bemutatása, amely természetből inspirált metaheurisztikák (GA, PSO, GWO, hibrid GA--PSO) segítségével csökkenti a napi villamosenergia-költséget, miközben betartja a fizikai és hálózati korlátokat. A megközelítés a szakirodalmi irányokhoz illeszkedik, de a különböző szcenáriókban végzett összehasonlítás révén gyakorlati szempontokat is hangsúlyoz \cite{Lazzari2023}.
 
-\section{Szakirodalmi áttekintés és kutatási rés (State of the Art)}
+A dolgozat célja egy olyan optimalizációs keret bemutatása, amely természetből inspirált metaheurisztikák -- GA, PSO, GWO és hibrid GA--PSO -- segítségével csökkenti a napi villamosenergia-költséget, miközben betartja a fizikai és hálózati korlátokat. A megközelítés a szakirodalmi irányokhoz illeszkedik \cite{Lazzari2023}, de a különböző szcenáriókban végzett összehasonlítás révén gyakorlati szempontokat is hangsúlyoz. A dolgozat egyik fő hozzájárulása a 2×2-es kísérleti mátrix, amely a bemeneti adatok realizmusát szisztematikusan változtatja, így lehetővé teszi az algoritmusok robusztusságának elkülönített vizsgálatát.
 
-A megújuló energiaforrások (RES) és az okosotthonok (Smart Home) optimalizálása az elmúlt évtizedben a villamosmérnöki és informatikai kutatások egyik legaktívabb területévé vált. A szakirodalomban a determinisztikus megoldások (például Lineáris Programozás, LP, vagy Kevert Egészértékű Lineáris Programozás, MILP) mellett egyre nagyobb hangsúlyt kapnak a természetből inspirált metaheurisztikák. Bár a determinisztikus módszerek elvi értelemben erős garanciákat adnak, a HEMS (Home Energy Management System) rendszerek nemlineáris peremfeltételei, például az akkumulátortöltés hatásfoka, a diszkrét ütemezési döntések és a büntetőfüggvények miatt a számítási igényük gyorsan megnőhet.
+\section{Szakirodalmi áttekintés és kutatási rés}
 
-\subsection{Metaheurisztikák a keresletoldali szabályozásban (DSM)}
-A keresletoldali szabályozás (Demand Side Management) célja a fogyasztási csúcsok mérséklése és a terhelés időbeli átrendezése. A szakirodalomban a Genetikus Algoritmusok (GA) és a Particle Swarm Optimization (PSO) bizonyultak a leggyakrabban alkalmazott alternatíváknak \cite{HollandGA1975, KennedyEberhartPSO1995}. A GA operátorai, különösen a keresztezés és a mutáció, jól illeszkednek a diszkrét ütemezési feladatokhoz, ahol egy-egy háztartási eszköz indítási idejét kell optimálisan kiválasztani.
+A megújuló energiaforrások és az okosotthonok optimalizálása az elmúlt évtizedben a villamosmérnöki és informatikai kutatások egyik legaktívabb területévé vált. A szakirodalomban a determinisztikus megoldások -- például Lineáris Programozás (LP) vagy Kevert Egészértékű Lineáris Programozás (MILP) -- mellett egyre nagyobb hangsúlyt kapnak a természetből inspirált metaheurisztikák. Bár a determinisztikus módszerek elvi értelemben erős garanciákat adnak, a HEMS rendszerek nemlineáris peremfeltételei, például az akkumulátortöltés hatásfoka, a diszkrét ütemezési döntések és a büntetőfüggvények miatt a számítási igényük gyorsan megnőhet.
 
-Ugyanakkor a PSO a szakirodalomban gyakran jelenik meg a fotovoltaikus rendszerek maximális teljesítménypont-követésének (Maximum Power Point Tracking, MPPT) megoldásaként is. Ezek a tanulmányok arra utalnak, hogy a PSO a lokális árnyékolásokkal terhelt környezetben is képes lehet megfelelő kompromisszumot adni a gyors konvergencia és a keresési hatékonyság között.
+\subsection{Metaheurisztikák a keresletoldali szabályozásban}
+
+A keresletoldali szabályozás célja a fogyasztási csúcsok mérséklése és a terhelés időbeli átrendezése. A szakirodalomban a Genetikus Algoritmusok (GA) és a Particle Swarm Optimization (PSO) bizonyultak a leggyakrabban alkalmazott alternatíváknak \cite{HollandGA1975, KennedyEberhartPSO1995}. A GA operátorai -- különösen a keresztezés és a mutáció -- jól illeszkednek a diszkrét ütemezési feladatokhoz, ahol egy-egy háztartási eszköz indítási idejét kell optimálisan meghatározni. A PSO a szakirodalomban emellett a fotovoltaikus rendszerek maximális teljesítménypont-követésének (MPPT) megoldásaként is megjelenik \cite{KumarGA}, ami arra utal, hogy változékony, zajos környezetben is képes elfogadható kompromisszumot adni a gyors konvergencia és a keresési hatékonyság között.
 
 \subsection{Adatminőség és bemeneti realizmus a korábbi kutatásokban}
-Bár az algoritmusok elméleti viselkedése jól dokumentált, a legtöbb elérhető tanulmány szintetikus vagy erősen egyszerűsített bemeneteken teszteli a rendszereket. A fogyasztási profilokat sok esetben generált görbékkel, a fotovoltaikus termelést pedig ideális, zajmentes napi alakzatokkal modellezik. Ez az eljárás hasznos a matematikai sajátosságok izolálására, ugyanakkor kevés információt ad arról, hogyan viselkedik egy algoritmus valós életbeli, zajos és aszimmetrikus bemenetek esetén.
 
-\subsection{A dolgozat által megcélzott kutatási rés (Research Gap)}
-Kevés olyan átfogó munka létezik, amely a metaheurisztikák robusztusságát külön-külön is vizsgálja a termelési és a fogyasztási oldalon jelentkező bizonytalanságok mellett. Jelen dolgozat ezt a hiányt kívánja csökkenteni azzal, hogy egy 2x2-es kísérleti mátrixban értékeli az algoritmusokat. A vizsgálat során a következő bemeneteket kombináljuk:
-\begin{itemize}
-	\item a fogyasztási oldalon az UCI Machine Learning Repository valódi, egyperces felbontású háztartási adataiból órásra aggregált profilokat,
-	\item a termelési oldalon egy valódi Huawei inverter mért adatait, amelyek tartalmazzák a felhőátvonulások és időjárási frontok okozta teljesítményingadozásokat,
-	\item az árazási oldalon az ENTSO-E romániai zónájának valós day-ahead piaci árait.
-\end{itemize}
-Ezzel a megközelítéssel nem csupán az algoritmusok sorrendjét állítjuk fel, hanem azt is egzakt módon megmutatjuk, hogyan változik a teljesítményük a valós világból származó zaj és bizonytalanság növekedésével.
+Bár az algoritmusok elméleti viselkedése jól dokumentált, a legtöbb elérhető tanulmány szintetikus vagy erősen egyszerűsített bemeneteken teszteli a rendszereket \cite{Fadaee2012}. A fogyasztási profilokat sok esetben generált görbékkel, a fotovoltaikus termelést pedig ideális, zajmentes napi alakzatokkal modellezik. Ez az eljárás hasznos a matematikai sajátosságok izolálására, ugyanakkor kevés információt ad arról, hogyan viselkedik egy algoritmus valós életbeli, zajos és aszimmetrikus bemenetek esetén.
+
+\subsection{A dolgozat által megcélzott kutatási rés}
+
+Kevés olyan átfogó munka létezik, amely a metaheurisztikák robusztusságát külön-külön is vizsgálja a termelési és a fogyasztási oldalon jelentkező bizonytalanságok mellett \cite{Lazzari2023}. Jelen dolgozat ezt a hiányt kívánja csökkenteni azzal, hogy egy 2×2-es kísérleti mátrixban értékeli az algoritmusokat. A vizsgálat során a következő bemenetek kombinációját alkalmazzuk: a fogyasztási oldalon az UCI Machine Learning Repository valódi, egyperces felbontású háztartási adataiból órásra aggregált profilokat, a termelési oldalon egy valódi Huawei inverter mért adatait -- amelyek tartalmazzák a felhőátvonulások és időjárási frontok okozta teljesítményingadozásokat --, az árazási oldalon pedig az ENTSO-E romániai zónájának valós day-ahead piaci árait. Ezzel a megközelítéssel nem csupán az algoritmusok sorrendjét állítjuk fel, hanem azt is megmutatjuk, hogyan változik a teljesítményük a valós világból származó zaj és bizonytalanság növekedésével.
