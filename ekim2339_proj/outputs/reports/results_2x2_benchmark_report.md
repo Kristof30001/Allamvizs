@@ -8,47 +8,47 @@
 
 | Algoritmus | Atlag koltseg | Szoras | Atlag gap % | Gyozelmek | Gyozelmi arany % | Atlag ido (s) |
 |---|---:|---:|---:|---:|---:|---:|
-| GA (P=100) | 13.07 | 7.64 | 1.08 | 10 | 62.5 | 0.293 |
-| GA (P=50) | 13.35 | 7.63 | 1.96 | 2 | 12.5 | 0.147 |
-| GWO | 13.48 | 7.24 | 5.40 | 4 | 25.0 | 0.195 |
-| Hybrid | 15.85 | 7.65 | 24.07 | 0 | 0.0 | 0.129 |
-| PSO | 17.61 | 7.54 | 38.14 | 0 | 0.0 | 0.110 |
+| GA (P=100) | 12.57 | 7.51 | 1.17 | 7 | 43.8 | 0.994 |
+| GA (P=50) | 12.69 | 7.58 | 1.50 | 2 | 12.5 | 0.497 |
+| GWO | 12.78 | 7.20 | 1.89 | 7 | 43.8 | 0.629 |
+| Hybrid | 13.85 | 7.31 | 10.93 | 0 | 0.0 | 0.415 |
+| PSO | 14.91 | 7.33 | 13.05 | 0 | 0.0 | 0.370 |
 
 ## real_pv_load_synthetic
 
 | Algoritmus | Atlag koltseg | Szoras | Atlag gap % | Gyozelmek | Gyozelmi arany % | Atlag ido (s) |
 |---|---:|---:|---:|---:|---:|---:|
-| GA (P=100) | 15.74 | 11.59 | 1.03 | 8 | 50.0 | 0.281 |
-| GA (P=50) | 16.12 | 11.59 | 3.75 | 2 | 12.5 | 0.143 |
-| GWO | 16.07 | 11.20 | 4.06 | 6 | 37.5 | 0.198 |
-| Hybrid | 18.54 | 11.36 | 27.29 | 0 | 0.0 | 0.127 |
-| PSO | 20.24 | 11.22 | 44.00 | 0 | 0.0 | 0.109 |
+| GA (P=100) | 15.31 | 11.49 | 1.05 | 8 | 50.0 | 0.953 |
+| GA (P=50) | 15.43 | 11.54 | 1.51 | 1 | 6.2 | 0.479 |
+| GWO | 15.59 | 11.09 | 1.63 | 7 | 43.8 | 0.621 |
+| Hybrid | 16.65 | 11.24 | 11.53 | 0 | 0.0 | 0.415 |
+| PSO | 17.60 | 11.29 | 18.02 | 0 | 0.0 | 0.363 |
 
 ## synthetic_pv_load_real
 
 | Algoritmus | Atlag koltseg | Szoras | Atlag gap % | Gyozelmek | Gyozelmi arany % | Atlag ido (s) |
 |---|---:|---:|---:|---:|---:|---:|
-| GA (P=100) | 10.07 | 3.63 | 0.45 | 13 | 81.2 | 0.310 |
-| GA (P=50) | 10.33 | 3.71 | 2.02 | 2 | 12.5 | 0.154 |
-| GWO | 10.89 | 3.94 | 5.07 | 1 | 6.2 | 0.205 |
-| Hybrid | 12.98 | 4.04 | 21.78 | 0 | 0.0 | 0.134 |
-| PSO | 14.75 | 4.45 | 35.73 | 0 | 0.0 | 0.115 |
+| GA (P=100) | 9.57 | 3.48 | 0.62 | 8 | 50.0 | 0.923 |
+| GA (P=50) | 9.71 | 3.52 | 1.56 | 3 | 18.8 | 0.465 |
+| GWO | 10.19 | 3.79 | 2.73 | 5 | 31.2 | 0.601 |
+| Hybrid | 10.96 | 3.58 | 8.71 | 0 | 0.0 | 0.401 |
+| PSO | 12.09 | 3.77 | 15.33 | 0 | 0.0 | 0.353 |
 
 ## synthetic_pv_load_synthetic
 
 | Algoritmus | Atlag koltseg | Szoras | Atlag gap % | Gyozelmek | Gyozelmi arany % | Atlag ido (s) |
 |---|---:|---:|---:|---:|---:|---:|
-| GA (P=100) | 12.67 | 7.20 | 0.32 | 12 | 75.0 | 0.294 |
-| GA (P=50) | 13.01 | 7.24 | 2.01 | 3 | 18.8 | 0.147 |
-| GWO | 13.34 | 7.28 | 3.29 | 1 | 6.2 | 0.195 |
-| Hybrid | 15.58 | 7.52 | 17.20 | 0 | 0.0 | 0.129 |
-| PSO | 17.71 | 7.19 | 34.74 | 0 | 0.0 | 0.110 |
+| GA (P=100) | 12.19 | 7.07 | 0.15 | 10 | 62.5 | 0.925 |
+| GA (P=50) | 12.38 | 7.13 | 0.77 | 1 | 6.2 | 0.466 |
+| GWO | 12.76 | 7.17 | 1.84 | 5 | 31.2 | 0.604 |
+| Hybrid | 13.74 | 7.16 | 8.76 | 0 | 0.0 | 0.402 |
+| PSO | 15.01 | 7.08 | 14.77 | 0 | 0.0 | 0.350 |
 
 ## Konkluzio
 
-- **real_pv_load_real** legjobbja: GA (P=100) (atlag gap: 1.08%, gyozelmi arany: 62.5%)
-- **real_pv_load_synthetic** legjobbja: GA (P=100) (atlag gap: 1.03%, gyozelmi arany: 50.0%)
-- **synthetic_pv_load_real** legjobbja: GA (P=100) (atlag gap: 0.45%, gyozelmi arany: 81.2%)
-- **synthetic_pv_load_synthetic** legjobbja: GA (P=100) (atlag gap: 0.32%, gyozelmi arany: 75.0%)
+- **real_pv_load_real** legjobbja: GA (P=100) (atlag gap: 1.17%, gyozelmi arany: 43.8%)
+- **real_pv_load_synthetic** legjobbja: GA (P=100) (atlag gap: 1.05%, gyozelmi arany: 50.0%)
+- **synthetic_pv_load_real** legjobbja: GA (P=100) (atlag gap: 0.62%, gyozelmi arany: 50.0%)
+- **synthetic_pv_load_synthetic** legjobbja: GA (P=100) (atlag gap: 0.15%, gyozelmi arany: 62.5%)
 
 A kiertékeles osszesen 1600 egyedi algoritmusfutast tartalmaz.

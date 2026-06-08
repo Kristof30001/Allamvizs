@@ -33,11 +33,11 @@ SEED_BASE = 20260323
 
 
 ALGORITHMS = {
-    "GA (P=50)": (GA, 40, 60),
-    "GA (P=100)": (GA, 80, 60),
-    "PSO": (PSO, 40, 60),
-    "GWO": (GWO, 40, 60),
-    "Hybrid": (Hybrid, 40, 60),
+    "GA (P=50)": (GA, 50, 150),
+    "GA (P=100)": (GA, 100, 150),
+    "PSO": (PSO, 50, 150),
+    "GWO": (GWO, 50, 150),
+    "Hybrid": (Hybrid, 50, 150),
 }
 
 

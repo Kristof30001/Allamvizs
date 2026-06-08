@@ -21,11 +21,11 @@ A rendszer alapját az óránkénti energiamérleg adja, amely a hálózatból v
 \begin{equation}
 P_{grid}(t) = P_{load}(t) + P_{shift}(t) - P_{pv}(t) + p_{batt}(t),
 \end{equation}
-ahol $P_{shift}(t)$ az időzített fogyasztók, például a mosógép vagy a mosogatógép által hozzáadott terhelés. A napi célfüggvény a hálózati energia költségét és a korlátsértési büntetéseket egyesíti:
+ahol $P_{shift}(t)$ az időzített fogyasztók, például a mosógép vagy a mosogatógép által hozzáadott terhelés. A napi célfüggvény a hálózati energia költségét, az akkumulátor-használat amortizációs költségét és a korlátsértési büntetéseket egyesíti:
 \begin{equation}
-J = \sum_{t=0}^{23} C_t\bigl(P_{grid}(t),\pi(t)\bigr) + \lambda_{soc} \cdot \Phi_{soc} + \lambda_{end} \cdot \Phi_{end},
+J = \sum_{t=0}^{23} \Bigl[ C_t\bigl(P_{grid}(t),\pi(t)\bigr) + c_{deg}\,\bigl|p_{batt}(t)\bigr| \Bigr] + \lambda_{soc} \cdot \Phi_{soc} + \lambda_{end} \cdot \Phi_{end},
 \end{equation}
-ahol $\pi(t)$ az órás ár, $\Phi_{soc}$ a töltöttségi (SOC) határok megsértésének büntetése, $\Phi_{end}$ pedig a nap végi SOC-visszatérés elmaradásának büntetése. A megoldás minőségét a napi költség mellett a hálózati terhelés egyenletessége is jellemzi; ez utóbbit a csúcs- és átlagfogyasztás hányadosaként értelmezett mutató, a Peak-to-Average Ratio (PAR) fejezi ki, amelynek csökkentése egyszerre jár költségelőnnyel és a hálózati csúcsok mérséklésével.
+ahol $\pi(t)$ az órás ár, $c_{deg}$ az óránként mozgatott energiára eső fajlagos degradációs költség (a modellben $c_{deg}=0{,}15$ RON/kWh), $\Phi_{soc}$ a töltöttségi (SOC) határok megsértésének büntetése, $\Phi_{end}$ pedig a nap végi SOC-visszatérés elmaradásának büntetése. A $c_{deg}\,|p_{batt}(t)|$ tag az akkumulátor kopását árazza be, és így elnyomja a gazdaságilag nem indokolt, gyakori töltés--kisütési mikrociklusokat: a megoldó csak akkor mozgatja a tárolót, ha a vételi és a visszatáplálási árak közötti különbség valóban meghaladja a kopás fajlagos költségét. A megoldás minőségét a napi költség mellett a hálózati terhelés egyenletessége is jellemzi; ez utóbbit a csúcs- és átlagfogyasztás hányadosaként értelmezett mutató, a Peak-to-Average Ratio (PAR) fejezi ki, amelynek csökkentése egyszerre jár költségelőnnyel és a hálózati csúcsok mérséklésével.
 
 \section{Korlátok, büntetések és a vétel-visszatáplálás aszimmetriája}
 A feladat korlátos jellegét elsősorban az akkumulátor fizikai határai adják. A töltöttségi szintnek minden órában a megengedett tartományban kell maradnia, a töltési és kisütési teljesítmény korlátozott, a nap végén pedig elvárás a kiindulási töltöttséghez közeli állapot visszaállítása, hogy a következő nap összehasonlítható feltételekkel induljon. Ezeket a feltételeket a célfüggvény nem kemény korlátként, hanem büntetőtagokon keresztül kezeli: a határok megsértése arányos költségnövekménnyel jár, ami a metaheurisztikák számára folytonos visszajelzést ad a megoldás megvalósíthatóságáról.
