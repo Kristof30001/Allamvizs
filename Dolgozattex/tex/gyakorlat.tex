@@ -49,6 +49,34 @@ Hibrid & fázismegosztás & 60\% PSO / 40\% GA \\
 \end{tabular}
 \end{table}
 
+A fizikai rendszer és a célfüggvény konkrét paramétereit a \ref{tab:sysparams}. táblázat rögzíti, így a benchmark az itt megadott értékekből hiánytalanul újrafuttatható. A kiértékelt tizenhat nap konkrét dátumai a függelékben hivatkozott \texttt{benchmark\_real\_vs\_synthetic.py} forrásfájlban találhatók; ezek évszakonkénti megoszlása négy téli, négy nyári és nyolc átmeneti nap.
+
+\begin{table}[H]
+\centering
+\caption{A fizikai rendszer és a célfüggvény paraméterei}
+\label{tab:sysparams}
+\begin{tabular}{lll}
+\toprule
+Komponens & Paraméter & Érték \\
+\midrule
+Akkumulátor & kapacitás & 10 kWh \\
+Akkumulátor & SOC-tartomány & 0,2 -- 0,9 \\
+Akkumulátor & kezdeti SOC & 0,5 \\
+Akkumulátor & max. töltés/kisütés & 3 kW \\
+\midrule
+Eltolható eszköz 1 & mosógép & 1,8 kW, 2 óra \\
+Eltolható eszköz 2 & mosogatógép & 1,5 kW, 2 óra \\
+\midrule
+Ár & visszatáplálási szorzó & 0,3 $\times$ vételi ár \\
+Költség & degradáció ($c_{deg}$) & 0,15 RON/kWh \\
+\midrule
+Büntetés & SOC-határsértés ($\lambda_{soc}$) & 5000 (kvadratikus) \\
+Büntetés & napvégi SOC ($\lambda_{end}$) & 2000 (lineáris) \\
+Büntetés & napvégi SOC-tűrés & 0,1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Szezonális szcenáriók eredményei}
 A rendszer robusztusságát három, markánsan eltérő szcenárióban vizsgáltuk, mindegyiket 20 ismétléssel. A téli esetet alacsony PV-termelés és magasabb alapfogyasztás jellemzi, ami nagy hálózati függést eredményez. A nyári időszakban ezzel szemben a csúcsban akár 6 kW-os PV-termelés és az alacsonyabb fogyasztás jelentős visszatáplálási potenciált hordoz. A harmadik, viharos vagy borús nap az erősen ingadozó termelése és a magas zaja miatt az akkumulátor dinamikus kezelését teszi szükségessé, ezért az algoritmusok számára stressztesztként szolgál. A nyers eredmények és a futási idők a \texttt{results\_winter}, a \texttt{results\_summer} és a \texttt{results\_cloudy} fájlokban kerültek mentésre.
 
