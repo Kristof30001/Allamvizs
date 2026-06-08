@@ -163,6 +163,14 @@ Valós PV       & (2) Termelési zaj & (4) Valós világ \\
 
 A négy eset egyenként más-más zajforrást izolál. Az első, lab-ideális eset tiszta, generált termelést és fogyasztást használ, és azt mutatja meg, milyen optimumot érnek el az algoritmusok ideális körülmények között. A második esetben a termelés valós inverteres adatokból származik, a fogyasztás viszont generált marad, így a termelési oldal bizonytalanságának hatása különül el. A harmadik esetben fordított a helyzet: a termelés ideális, a fogyasztás viszont az UCI-adatsorból vett, valós háztartási profil, ami a fogyasztási oldal zaját ragadja meg. A negyedik, valós világ eset mindkét oldalon zajos, és ez az a forgatókönyv, amelyben a megoldónak a teljes bizonytalanság ismeretében kell döntenie. Ez a kereszt-validáció más kutatási területeken, például a képfeldolgozásban már bevett gyakorlat, a HEMS-kontextusban azonban újszerű, mivel egyszerre teszi azonosíthatóvá a zaj forrását, méri az algoritmusok általánosíthatóságát, és a gyakorlati hasznosságot nem az elméleti, hanem a valós eset alapján rangsorolja.
 
+A valós bemenetek szemléltetésére a \ref{fig:realpv_day}. ábra egy átmeneti, felhős tavaszi nap valós inverteres PV-termelését, háztartási fogyasztását és az ENTSO-E day-ahead árprofilját mutatja. A generált, sima görbékkel szemben a valós PV-termelés szabálytalan, felhőátvonulások okozta letöréseket és tüskéket tartalmaz, ami a keresési teret rücskösebbé teszi.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{ekim2339_proj/outputs/plots/days/2025-03-17_realpv_price.png}
+\caption{Egy felhős átmeneti nap (2025-03-17) valós bemenetei: PV-termelés, fogyasztás, nettó terhelés és az ENTSO-E day-ahead ár.}
+\label{fig:realpv_day}
+\end{figure}
+
 A mátrix 16 kiválasztott napot, öt algoritmust, négy kombinációs esetet és profilonként öt futást fog össze, ami összesen 1600 algoritmus-futtatást jelent. Az aggregált eredményeket a \ref{tab:realpv_synth_summary}. táblázat foglalja össze, amely jól mutatja a minőség és a sebesség közötti kompromisszumot a különböző zajszintek mellett.
 
 \begin{table}[H]
@@ -209,6 +217,14 @@ Adathalmaz & Algoritmus & Átlagköltség (RON) & Gap \% & Győzelmi arány \% \
 A táblázatból kitűnik, hogy a GA (P=100) mind a négy adathalmazon a legstabilabb maradt: az átlagköltsége és a résértéke is következetesen a legjobb, a gap sehol nem haladja meg az 1,2\%-ot. A győzelmi arányai a zaj növekedésével fokozatosan mérséklődnek: a teljesen szintetikus, laboratóriumi esetben a legmagasabb (62,5\%), a termelési és a fogyasztási zaj mellett egyaránt 50,0\%, a mindkét oldalon valós adatot használó esetben pedig 43,8\%. Éppen ez utóbbi, legnehezebb forgatókönyvben lép elő a GWO egyenrangú vetélytársként: győzelmi aránya szintén 43,8\%, vagyis pontosan ugyanannyi napon (hétszer a tizenhatból) adta a legjobb futást, mint a GA (P=100); a genetikus algoritmus elsőségét itt már csak a valamivel alacsonyabb átlagköltsége (12,57 a 12,78 RON helyett) és kisebb résértéke (1,17\% a 1,89\% helyett) tartja meg. A GWO végig a legerősebb második a győzelmi arány alapján: a termelési zaj esetében is 43,8\%-ot, a másik két adathalmazon pedig 31,2\%-ot ér el, következetesen felülmúlva a GA (P=50)-et, amely viszont a kissé alacsonyabb átlagköltségével ellensúlyoz. Ez a kettősség jól mutatja a kevés paramétert igénylő, fokozatosan finomhangoló szürkefarkas-keresés erősségét: gyakrabban találja meg a napi legjobb megoldást, jóllehet átlagban valamivel ingadozóbb.
 
 A PSO ezzel szemben mind a négy adathalmazon az utolsó helyen végzett: az átlagköltsége végig a legmagasabb, a résértéke pedig a laboratóriumi 14,8\%-ról a termelési zaj melletti, mintegy 18\%-os maximumig nő. A hibrid eljárás egyik adathalmazon sem nyert, és a résértéke (9--12\%) tartósan az önálló genetikus algoritmus mögött maradt, mert a PSO-fázis a valós, tüskés bemeneteken hajlamos a korai stagnálásra, a hátralévő GA-fázis pedig már nem tudja teljesen helyreállítani a populáció sokszínűségét. A 2x2-es benchmark így megerősíti, hogy a valós adatok bevezetése kritikus lépés a HEMS-algoritmusok értékelésében: a szintetikus körülmények között mért sorrend nem vihető át változatlanul a valós üzemre, és a robusztusság szempontjából a diverzitást megőrző keresés bizonyul megbízhatóbbnak.
+
+A robusztussági sorrendet a legnehezebb, mindkét oldalon valós adatot használó esetre a \ref{fig:gap_realworld}. ábra szemlélteti: a két genetikus változat és a GWO átlagos résértéke egyaránt 2\% alatt marad, míg a hibridé és különösen a PSO-é nagyságrenddel nagyobb.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{ekim2339_proj/outputs/plots/summary/real_pv_load_real_avg_gap_pct.png}
+\caption{Átlagos relatív rés (gap) algoritmusonként a valós világ (valós PV + valós fogyasztás) adathalmazon.}
+\label{fig:gap_realworld}
+\end{figure}
 
 \section{Reprodukálhatóság és seedelési séma}
 A benchmark megismételhetőségét egy determinisztikus seedelési séma biztosítja, amely a véletlenszerűséget kontrollált módon kezeli. A nap- és ismétlésindexből minden futásra stabil seed számolódik, ehhez pedig a profil és az algoritmus indexéből származó eltolás társul. Ennek a kettős konstrukciónak két, egymást kiegészítő célja van: egyrészt garantálja, hogy ugyanazzal a konfigurációval és ugyanazokkal a bemeneti fájlokkal a futások pontosan reprodukálhatók legyenek, másrészt csökkenti a különböző profilok és algoritmusok közötti véletlen-összefonódást, vagyis azt, hogy két futás véletlenül ugyanazt a sztochasztikus pályát járja be. Így az eredmények nem egyetlen szerencsés futás benyomásai, hanem ellenőrzött körülmények között újratermelhető mérések.
