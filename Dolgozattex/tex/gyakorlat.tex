@@ -36,9 +36,9 @@ GA & keresztezés & aritmetikai + zaj \\
 GA & mutáció & Gauss-perturbáció \\
 \midrule
 PSO & populáció & 50 \\
-PSO & tehetetlenség ($w$) & 0.7 \\
-PSO & kognitív ($c_1$) & 1.5 \\
-PSO & szociális ($c_2$) & 1.5 \\
+PSO & tehetetlenség ($w$) & 0.6 \\
+PSO & kognitív ($c_1$) & 1.8 \\
+PSO & szociális ($c_2$) & 1.8 \\
 \midrule
 GWO & populáció & 50 \\
 GWO & vezérlőparaméter ($\vec{a}$) & 2 $\rightarrow$ 0 (lineáris) \\
@@ -175,38 +175,40 @@ A mátrix 16 kiválasztott napot, öt algoritmust, négy kombinációs esetet é
 Adathalmaz & Algoritmus & Átlagköltség (RON) & Gap \% & Győzelmi arány \% \\
 \midrule
 \multirow{5}{*}{(1) Lab-ideális (Synth PV + Synth Load)}
-& GA (P=100) & 10.50 & 1.56 & 62.5 \\
-& GA (P=50)  & 10.86 & 4.69 & 25.0 \\
-& GWO        & 11.37 & 10.14 & 12.5 \\
-& Hybrid     & 13.04 & 27.45 & 0.0 \\
-& PSO        & 14.02 & 41.00 & 0.0 \\
+& GA (P=100) & 12.67 & 0.32 & 75.0 \\
+& GA (P=50)  & 13.01 & 2.01 & 18.8 \\
+& GWO        & 13.34 & 3.29 & 6.2 \\
+& Hybrid     & 15.58 & 17.20 & 0.0 \\
+& PSO        & 17.71 & 34.74 & 0.0 \\
 \midrule
 \multirow{5}{*}{(2) Termelési zaj (Real PV + Synth Load)}
-& GA (P=100) & 13.61 & 0.96 & 62.5 \\
-& GA (P=50)  & 13.90 & 32.08 & 18.8 \\
-& GWO        & 14.23 & 60.65 & 18.8 \\
-& Hybrid     & 15.43 & 82.20 & 0.0 \\
-& PSO        & 16.70 & 159.08 & 0.0 \\
+& GA (P=100) & 15.74 & 1.03 & 50.0 \\
+& GA (P=50)  & 16.12 & 3.75 & 12.5 \\
+& GWO        & 16.07 & 4.06 & 37.5 \\
+& Hybrid     & 18.54 & 27.29 & 0.0 \\
+& PSO        & 20.24 & 44.00 & 0.0 \\
 \midrule
 \multirow{5}{*}{(3) Fogyasztási zaj (Synth PV + Real Load)}
-& GA (P=100) & 7.76 & 2.73 & 62.5 \\
-& GA (P=50)  & 7.96 & 3.72 & 31.2 \\
-& GWO        & 8.77 & 13.15 & 6.2 \\
-& Hybrid     & 9.79 & 23.30 & 0.0 \\
-& PSO        & 11.14 & 45.33 & 0.0 \\
+& GA (P=100) & 10.07 & 0.45 & 81.2 \\
+& GA (P=50)  & 10.33 & 2.02 & 12.5 \\
+& GWO        & 10.89 & 5.07 & 6.2 \\
+& Hybrid     & 12.98 & 21.78 & 0.0 \\
+& PSO        & 14.75 & 35.73 & 0.0 \\
 \midrule
 \multirow{5}{*}{(4) Valós világ (Real PV + Real Load)}
-& GA (P=100) & 10.80 & 1.97 & 50.0 \\
-& GA (P=50)  & 11.13 & 5.24 & 31.2 \\
-& GWO        & 11.64 & 17.29 & 18.8 \\
-& Hybrid     & 13.17 & 44.28 & 0.0 \\
-& PSO        & 13.92 & 72.32 & 0.0 \\
+& GA (P=100) & 13.07 & 1.08 & 62.5 \\
+& GA (P=50)  & 13.35 & 1.96 & 12.5 \\
+& GWO        & 13.48 & 5.40 & 25.0 \\
+& Hybrid     & 15.85 & 24.07 & 0.0 \\
+& PSO        & 17.61 & 38.14 & 0.0 \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 
-A táblázatból kitűnik, hogy a GA (P=100) mind a négy adathalmazon robusztus maradt, hiszen az átlagos költsége és a résértéke is következetesen a legjobb. A valós világ esetben azonban, ahol mind a termelés, mind a fogyasztás magas zajszinttel terhelt, a győzelmi aránya 62.5\%-ról 50.0\%-ra esett, ami a keresési tér jelentős nehezedését jelzi. A PSO a laboratóriumi körülmények között még elfogadható lemaradással futott, a valós, zajos idősorok, különösen a valós PV bevezetésekor viszont a teljesítménye összeomlott, helyenként 159\%-os résig. Ez megerősíti, hogy a valós adatok használata a HEMS-algoritmusok értékelésében nem formaság, hanem kritikus lépés.
+A táblázatból kitűnik, hogy a GA (P=100) mind a négy adathalmazon a legstabilabb maradt: az átlagköltsége és a résértéke is következetesen a legjobb, a gap sehol nem haladja meg az 1,1\%-ot. A győzelmi arányai ugyanakkor árnyalják a képet: a fogyasztási zaj esetében a legmagasabb (81,2\%), a teljesen szintetikus és a valós világ esetben is meggyőző (75,0\%, illetve 62,5\%), a termelési zaj esetében viszont 50,0\%-ra esik. Éppen ebben az esetben, vagyis amikor a valós inverteres PV-termelés generált fogyasztással párosul, lép elő a GWO a legerősebb másodikként: győzelmi aránya 37,5\%-ra nő, sőt az átlagköltsége (16,07 RON) minimálisan a GA (P=50) alá kerül. A valós világ esetben szintén a GWO a legjobb második (25,0\%), ami arra utal, hogy a kevés paramétert igénylő, fokozatosan finomhangoló szürkefarkas-keresés különösen a termelési oldal zaját viseli jól.
+
+A PSO ezzel szemben mind a négy adathalmazon az utolsó helyen végzett: az átlagköltsége végig a legmagasabb, a résértéke pedig a laboratóriumi 34,7\%-ról a termelési zaj melletti, közel 44\%-os maximumig nő. A hibrid eljárás egyik adathalmazon sem nyert, és a résértéke (17--27\%) tartósan az önálló genetikus algoritmus mögött maradt, mert a PSO-fázis a valós, tüskés bemeneteken hajlamos a korai stagnálásra, a hátralévő GA-fázis pedig már nem tudja teljesen helyreállítani a populáció sokszínűségét. A 2x2-es benchmark így megerősíti, hogy a valós adatok bevezetése kritikus lépés a HEMS-algoritmusok értékelésében: a szintetikus körülmények között mért sorrend nem vihető át változatlanul a valós üzemre, és a robusztusság szempontjából a diverzitást megőrző keresés bizonyul megbízhatóbbnak.
 
 \section{Reprodukálhatóság és seedelési séma}
 A benchmark megismételhetőségét egy determinisztikus seedelési séma biztosítja, amely a véletlenszerűséget kontrollált módon kezeli. A nap- és ismétlésindexből minden futásra stabil seed számolódik, ehhez pedig a profil és az algoritmus indexéből származó eltolás társul. Ennek a kettős konstrukciónak két, egymást kiegészítő célja van: egyrészt garantálja, hogy ugyanazzal a konfigurációval és ugyanazokkal a bemeneti fájlokkal a futások pontosan reprodukálhatók legyenek, másrészt csökkenti a különböző profilok és algoritmusok közötti véletlen-összefonódást, vagyis azt, hogy két futás véletlenül ugyanazt a sztochasztikus pályát járja be. Így az eredmények nem egyetlen szerencsés futás benyomásai, hanem ellenőrzött körülmények között újratermelhető mérések.
