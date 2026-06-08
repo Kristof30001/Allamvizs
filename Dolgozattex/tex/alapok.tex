@@ -1,38 +1,33 @@
 %!TEX root = hems_proj.tex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Irodalmi Áttekintés és Fogalmi Alapok}\label{ch:ALAPOK}
+\chapter{Irodalmi Áttekintés és a Feladat Megfogalmazása}\label{ch:ALAPOK}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{osszefoglal}
-Áttekintjük a HEMS terület fő irányait, valamint bevezetünk néhány alapfogalmat a modell értelmezéséhez.
+A fejezet áttekinti a HEMS-optimalizálás szakirodalmi irányait, kijelöli a dolgozat által megcélzott kutatási rést, majd formálisan megfogalmazza az optimalizálási feladatot.
 \end{osszefoglal}
 
-\section{Irodalmi háttér}
+\section{Szakirodalmi háttér és kutatási rés}
+A megújuló energiaforrások és az okosotthonok optimalizálása az elmúlt évtizedben a villamosmérnöki és informatikai kutatások egyik legaktívabb területévé vált. A szakirodalomban a determinisztikus megoldások, például a lineáris programozás (LP) és a kevert egészértékű lineáris programozás (MILP) mellett egyre nagyobb hangsúlyt kapnak a természetből inspirált metaheurisztikák. Bár a determinisztikus módszerek elvi értelemben erős garanciákat adnak, a HEMS-rendszerek nemlineáris peremfeltételei, így az akkumulátortöltés hatásfoka, a diszkrét ütemezési döntések és a büntetőfüggvények miatt a számítási igényük gyorsan megnő, ezért a helyi optimumokat és a bizonytalan bemeneteket jól toleráló metaheurisztikák széles körben elterjedtek \cite{Ismail2014, Fadaee2012}.
 
-A HEMS rendszerek optimalizálása tipikusan korlátozott, nemlineáris feladat, amelyben a helyi optimumok és a bizonytalan bemenetek miatt a metaheurisztikus megoldások széles körben elterjedtek \cite{Ismail2014}. A sztochasztikus termelés és a tárolás kezelési nehézségei a rendszer rugalmasságát és korlátkezelést helyezik előtérbe \cite{Fadaee2012}. A különböző algoritmusok jellemzően trade-offokkal dolgoznak a gyorsaság és a pontosság, illetve az átlagos és a legjobb megoldás minősége között, ezért az összehasonlító vizsgálat módszertani szempontból különösen indokolt.
+A keresletoldali szabályozásban a genetikus algoritmusok és a részecskeraj-optimalizálás bizonyultak a leggyakrabban alkalmazott eljárásoknak \cite{HollandGA1975, KennedyEberhartPSO1995}. A GA keresztező és mutációs operátorai jól illeszkednek a diszkrét ütemezési feladatokhoz, ahol egy-egy háztartási eszköz indítási idejét kell megfelelően kiválasztani, míg a PSO gyors konvergenciája a fotovoltaikus rendszerek maximális teljesítménypont-követésében (MPPT) is bevált. A gyakorlatban a különböző algoritmusok jellemzően ugyanazokkal a kompromisszumokkal dolgoznak: a gyorsaság és a pontosság, illetve az átlagos és a legjobb megoldás között kell egyensúlyozniuk.
 
-\section{Optimalizálási modell és döntési változók}
+A jelen dolgozat által megcélzott kutatási rés a bemeneti adatok realizmusához kapcsolódik. A legtöbb elérhető tanulmány szintetikus vagy erősen egyszerűsített bemeneteken teszteli a rendszereket: a fogyasztási profilokat gyakran generált görbékkel, a fotovoltaikus termelést pedig ideális, zajmentes napi alakzatokkal modellezik. Ez az eljárás hasznos a matematikai sajátosságok izolálására, ám keveset árul el arról, hogyan viselkedik egy algoritmus valós, zajos és aszimmetrikus bemenetek esetén. A dolgozat éppen ezt a hiányt igyekszik betölteni azzal, hogy valós day-ahead árakat, mért PV-termelést és valós háztartási fogyasztást is bevon a kiértékelésbe, és ezeket szisztematikusan szembeállítja a szintetikus megfelelőikkel.
 
-A jelenlegi implementációban a napi optimalizálási feladat 24 órás horizonton fut. A döntési vektor két fő részre bontható: az akkumulátor teljesítmény-vektorra -- $p_{batt}(t)$, ahol $t=0,\dots,23$ -- és az eltolható eszközök indítási idejére, ahol $s_j$ jelöli a $j$-edik eszköz indulási időpontját.
+\section{Az optimalizálási feladat és a döntési változók}
+A jelen implementációban a napi optimalizálási feladat 24 órás horizonton fut, és a döntési vektor két fő részből áll. Az első rész az akkumulátor óránkénti teljesítmény-vektora, $p_{batt}(t)$, ahol $t=0,\dots,23$, a második pedig az eltolható eszközök indítási ideje, $s_j$, ahol $j$ az eszköz indexe. A modell így egyszerre tartalmaz folytonos (töltés-kisütés) és diszkrét jellegű (eszközindítás) döntéseket, ami indokolja a metaheurisztikus megközelítést.
 
-Az energiamérleg óránként a következőképpen írható fel:
+A rendszer alapját az óránkénti energiamérleg adja, amely a hálózatból vételezett teljesítményt a fogyasztás, az eltolható terhelés, a napelemes termelés és az akkumulátor teljesítményének eredőjeként írja le:
 \begin{equation}
-P_{grid}(t) = P_{load}(t) + P_{shift}(t) - P_{pv}(t) + p_{batt}(t)
+P_{grid}(t) = P_{load}(t) + P_{shift}(t) - P_{pv}(t) + p_{batt}(t),
 \end{equation}
-ahol $P_{shift}(t)$ az időzített fogyasztók -- például mosógép, mosogatógép -- által az adott órában hozzáadott terhelés.
-
-A napi célfüggvény a hálózati energia költségét és a korlátsértési büntetéseket egyesíti:
+ahol $P_{shift}(t)$ az időzített fogyasztók, például a mosógép vagy a mosogatógép által hozzáadott terhelés. A napi célfüggvény a hálózati energia költségét és a korlátsértési büntetéseket egyesíti:
 \begin{equation}
-J = \sum_{t=0}^{23} C_t(P_{grid}(t),\pi(t)) + \lambda_{soc} \cdot \Phi_{soc} + \lambda_{end} \cdot \Phi_{end}
+J = \sum_{t=0}^{23} C_t\bigl(P_{grid}(t),\pi(t)\bigr) + \lambda_{soc} \cdot \Phi_{soc} + \lambda_{end} \cdot \Phi_{end},
 \end{equation}
-ahol $\pi(t)$ az adott órás ár, $\Phi_{soc}$ a SOC-határok sértésének büntetése, $\Phi_{end}$ pedig a napvégi SOC-visszatérés büntetése.
+ahol $\pi(t)$ az órás ár, $\Phi_{soc}$ a töltöttségi (SOC) határok megsértésének büntetése, $\Phi_{end}$ pedig a nap végi SOC-visszatérés elmaradásának büntetése. A megoldás minőségét a napi költség mellett a hálózati terhelés egyenletessége is jellemzi; ez utóbbit a csúcs- és átlagfogyasztás hányadosaként értelmezett mutató, a Peak-to-Average Ratio (PAR) fejezi ki, amelynek csökkentése egyszerre jár költségelőnnyel és a hálózati csúcsok mérséklésével.
 
-\section{Korlátok és büntetéses kezelés}
+\section{Korlátok, büntetések és a vétel-visszatáplálás aszimmetriája}
+A feladat korlátos jellegét elsősorban az akkumulátor fizikai határai adják. A töltöttségi szintnek minden órában a megengedett tartományban kell maradnia, a töltési és kisütési teljesítmény korlátozott, a nap végén pedig elvárás a kiindulási töltöttséghez közeli állapot visszaállítása, hogy a következő nap összehasonlítható feltételekkel induljon. Ezeket a feltételeket a célfüggvény nem kemény korlátként, hanem büntetőtagokon keresztül kezeli: a határok megsértése arányos költségnövekménnyel jár, ami a metaheurisztikák számára folytonos visszajelzést ad a megoldás megvalósíthatóságáról.
 
-A modellben explicit korlátok szerepelnek mind az akkumulátorra, mind az időzített eszközökre vonatkozóan. Az akkumulátornál az állapotváltozó (SOC) minimális és maximális értéke közé szorítás történik, amelyet kvadratikus büntetéssel egészítünk ki. Ez a megközelítés a gyakorlatban stabilabb keresést ad, mint a tisztán „hard" eldobásos korlátkezelés, mivel a büntetőfüggvény folytonosan vezeti az optimalizálót a megvalósítható tartomány felé.
-
-Az időzített eszközöknél az indítási idő folytonos döntési változóként jelenik meg, de a kiértékelés során egész órára kerekítés történik. Ez a modell egyszerre tartja meg a metaheurisztikák folyamatos keresési előnyeit, miközben fizikailag értelmezhető ütemezést eredményez.
-
-\section{Vétel és visszatáplálás aszimmetriája}
-
-A jelenlegi költségmodellben a hálózati vételezés teljes órás áron történik, míg a visszatáplálás csökkentett szorzóval -- jellemzően az ár 30\%-ával -- kerül elszámolásra. Ez az aszimmetria valós üzemeltetési helyzeteket közelít: a túltermelés nem azonos értékű a csúcsidős fogyasztás kiváltásával. Emiatt az optimalizáló természetes módon olyan stratégiákat preferál, amelyek inkább a lokális önfogyasztást és a jól időzített akkumulátor-használatot valósítják meg, semmint a felesleges visszatáplálást.
+A modell egy fontos gyakorlati aszimmetriát is figyelembe vesz: a hálózatból vételezett és a hálózatba visszatáplált energia ára eltér. A visszatáplálásért kapott térítés jellemzően alacsonyabb a vételi árnál, ezért a saját termelés helyben történő felhasználása, illetve tárolása rendszerint előnyösebb, mint a hálózatba juttatása. Ez az aszimmetria érdemben befolyásolja az akkumulátor optimális vezérlését, és magyarázza, hogy a megoldó miért törekszik a többlettermelés tárolására ahelyett, hogy azonnal visszatáplálná azt.

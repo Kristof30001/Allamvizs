@@ -1,0 +1,44 @@
+%!TEX root = hems_proj.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Következtetések és További Célok}\label{ch:ZARSZO}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{osszefoglal}
+A fejezet összegzi a dolgozat fő megállapításait, kitér a gazdasági és környezeti vonatkozásokra, végül felvázolja a továbbfejlesztés lehetséges irányait.
+\end{osszefoglal}
+
+\section{Összegző következtetések}
+A dolgozat fő tanulsága, hogy a HEMS-optimalizálásban a bemeneti adatok realizmusa legalább annyira meghatározó, mint maga az algoritmusválasztás. A szezonális és a 2x2-es kísérletek együtt azt mutatták, hogy a tisztán szintetikus környezetben elért teljesítmény nem vetíthető ki közvetlenül a valós üzemre: amint a termelési és a fogyasztási oldalon is valós, zajos idősorok jelennek meg, a keresési tér rücskössé válik, és az algoritmusok közötti különbségek felerősödnek. Ebben a megváltozott környezetben a populáció sokszínűségét fenntartó genetikus algoritmus, különösen a 100-as populációval futtatott változat bizonyult a legstabilabbnak, míg a gyors, de a globális legjobbhoz erősen vonzódó PSO a valós bemenetekre érzékenynek mutatkozott.
+
+Fontos kiemelni, hogy nem létezik egyetlen, minden helyzetben legjobb módszer. A szűkös téli termelés mellett a kevés paramétert igénylő szürkefarkas-optimalizáló adta a legjobb átlagot, a bőséges nyári termelésnél a genetikus algoritmus finomhangolási előnye érvényesült, a hibrid eljárás pedig kiegyensúlyozott, de nem mindig kiemelkedő teljesítményt nyújtott. A választás ezért az üzemeltetési prioritástól függ: a stabilitás, a futási idő vagy a paraméterigény eltérő súlyozása más-más módszert tesz előnyössé. A projekt értékét nem utolsósorban az adja, hogy valós árinformációra épül, szétválasztja a bemeneti realizmus és az algoritmikus teljesítmény hatását, és a nyers adatok, valamint az összegző mutatók mentése révén minden megállapítása visszakövethető.
+
+\section{Gazdasági és környezeti megfontolások}
+A modell gyakorlati relevanciájának érzékeltetésére érdemes egy indikatív gazdasági becslést is megadni, hangsúlyozva, hogy ez nem mért eredmény, hanem a komponensek közelítő romániai piaci áraira és a szimulált napi költségcsökkenések éves szintre vetítésére épülő nagyságrendi tájékozódás. A \ref{tab:gazdasagi}. táblázat egy közepes méretű háztartás tipikus konfigurációját veszi alapul. Az itt szereplő éves megtakarítás a kísérletekben tapasztalt napi költségcsökkenésekből származó, évszakok közötti átlagolással becsült érték, ezért a tényleges megtérülés a fogyasztási szokásoktól, a tarifától és az időjárástól függően érdemben eltérhet.
+
+\begin{table}[H]
+\centering
+\caption{Indikatív beruházási és megtérülési becslés egy közepes háztartásra}
+\label{tab:gazdasagi}
+\begin{tabular}{lc}
+\toprule
+Tétel & Közelítő érték \\
+\midrule
+HEMS-hardver & 1\,200 RON \\
+5 kWp napelemes rendszer & 15\,000 RON \\
+10 kWh akkumulátor & 18\,000 RON \\
+\midrule
+Teljes beruházás & 34\,200 RON \\
+Becsült éves megtakarítás & 6\,200 RON \\
+Becsült megtérülési idő & 5--6 év \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A megtérülés a romániai Casa Verde típusú támogatásokkal jellemzően három-négy évre rövidülhet. A környezeti hatás szintén számottevő, bár szintén becslés jellegű: egy évi mintegy 6\,000 kWh saját napelemes termelés nagyságrendileg 4--5 tonna szén-dioxid kiváltását jelentheti, amihez a terheléseltolásból és a hatékonyságnövelésből származó további megtakarítás társul. Ezek a számok a rendszer rendeltetésszerű, teljes kihasználását feltételezik, ezért inkább a lehetséges hatás nagyságrendjét, mintsem pontos értékét érzékeltetik.
+
+\section{További fejlesztési irányok}
+A jelenlegi modell több irányban is továbbfejleszthető, és ezek a lépések egyúttal az eredmények tudományos megalapozottságát is erősítenék. A legközvetlenebb feladat magának a kiértékelésnek a megerősítése: a jelenlegi, profilonként két futás helyett algoritmusonként és profilonként legalább tíz-húsz ismétlés, valamint az ezekre épülő konfidencia-intervallumok használata megbízhatóbbá tenné az összehasonlítást, és csökkentené az egy-egy szerencsés vagy kedvezőtlen seed torzító hatását. Ehhez kapcsolódóan érdemes volna egy egységes alapvonalat, akkumulátor és ütemezés nélküli esetet, valamint rögzített tanuló- és validációs naplistát is definiálni.
+
+A modell oldaláról a legfontosabb pontosítás a célfüggvény bővítése: a jelenlegi költségmodell még nem tartalmaz explicit akkumulátor-degradációs költséget, a visszatáplálási árat pedig egyszerűsített szorzóval kezeli, így a gazdasági becslések finomításához ezeket a tényezőket érdemes lenne részletesebben modellezni. Tartalmi irányban a vizsgálat kiterjeszthető több, egymástól eltérő profilú háztartásra és speciális fogyasztókra, például hőszivattyúra vagy elektromos jármű töltésére, valamint hosszabb, akár éves, megszakítás nélküli időhorizontra.
+
+Hosszabb távon több, a szakirodalomban is ígéretes irány érdemel figyelmet. Az energiaközösségek és a felhasználók közötti energiakereskedelem bevonása a megosztott tárolás révén tovább csökkentheti a tagok költségeit; a többcélú, Pareto-front alapú optimalizálás lehetővé tenné, hogy a felhasználó maga válasszon a költségminimalizálás és a komfort között; a gépi tanulás, például az időjárás- és fogyasztás-előrejelzés integrálása pontosabb, előretekintő ütemezést adhatna; a jármű-hálózat (Vehicle-to-Grid) megközelítés pedig az elektromos autók akkumulátorát mobil tárolóként vonná be a rendszerbe. Ezek az irányok együttesen mutatják, hogy a bemutatott keret nemcsak önmagában értékes, hanem szilárd alapot ad a további, valós környezetben is helytálló kutatáshoz.

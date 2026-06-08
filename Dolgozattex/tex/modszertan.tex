@@ -4,33 +4,28 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{osszefoglal}
-Ez a fejezet a projekt jelenlegi implementációs állapotának megfelelően formalizálja a teljes pipeline-t: adatforrások, profilépítés, optimalizálási ciklus és kiértékelési lépések. A cél, hogy az eredmények ne csak reprodukálhatók, hanem módszertanilag auditálhatók is legyenek.
+Ez a fejezet a teljes feldolgozási láncot formalizálja az adatforrásoktól a profilépítésen és az optimalizálási cikluson át a riportolásig, azzal a céllal, hogy az eredmények ne csak reprodukálhatók, hanem módszertanilag is auditálhatók legyenek.
 \end{osszefoglal}
 
 \section{Rendszerblokkok és felelősségek}
-
-A megoldás moduláris felépítésű, az egyes komponensek egyértelmű felelősségi határokkal működnek. A \texttt{hems\_problem.py} modul tartalmazza a döntési teret, a célfüggvényt és a korlátkezelést. Az \texttt{algorithms.py} fájlban kapott helyet a GA, PSO, GWO és a hibrid GA-PSO optimalizáló. A \texttt{data\_generator.py} a szintetikus load/PV profilok generálásáért és a CSV validációért felelős, míg a \texttt{price\_loader.py} az ENTSO-E árak betöltését és a napi árprofil-képzést végzi. A teljes benchmark-vezérlés, az aggregáció és a riportolás a \texttt{benchmark\_real\_vs\_synthetic.py} modulban van összefogva. A moduláris szerkezet célja, hogy egy-egy részegység -- például az árkezelés vagy a célfüggvény -- változtatása minimális oldalkövetkezménnyel járjon.
+A megoldás moduláris felépítésű, és az egyes komponensek egyértelmű felelősségi határokkal működnek. A \texttt{hems\_problem.py} modul tartalmazza a döntési teret, a célfüggvényt és a korlátkezelést, az \texttt{algorithms.py} a GA, a PSO, a GWO és a hibrid optimalizálók implementációját, a \texttt{data\_generator.py} a szintetikus terhelés- és PV-profilok előállítását, valamint a CSV-validációt. Az árak feldolgozását a \texttt{price\_loader.py} végzi, amely betölti az ENTSO-E day-ahead árakat és napi árprofilt képez belőlük, míg a teljes benchmark vezérlését, az aggregációt és a riportolást a \texttt{benchmark\_real\_vs\_synthetic.py} fogja össze. Ez a szétválasztás azt a célt szolgálja, hogy egy-egy részegység, például az árkezelés vagy a célfüggvény módosítása minimális oldalkövetkezménnyel járjon a rendszer többi részére nézve.
 
 \section{Adatforrások és előfeldolgozás}
+A benchmark két, egymástól független külső adatkörre épül, amelyeket egységes belső formátumra hozunk, mielőtt a profilépítés felhasználná őket. Az első adatkör a termelési oldalt írja le: egy valós inverter öt perces felbontású teljesítmény-idősorait órás átlaggá vonjuk össze, hogy illeszkedjen a 24 órás optimalizálási horizonthoz. A második adatkör az árazási oldal, amelyet az ENTSO-E day-ahead piacáról veszünk EUR/MWh egységben, majd a hazai költségszámításhoz RON/kWh formára konvertálunk. Az áradatok feldolgozása ezután a romániai zónára szűkít, normalizálja az időbélyegeket, és órás felbontásra mintavételezi újra a sorozatot. Mivel a valós forrás időnként hiányos, a rendszer azokra a napokra, ahol az árprofil nem teljes, egy időfüggő tarifán (Time-of-Use) alapuló tartalék árat illeszt be; így a feldolgozási lánc részlegesen hiányos bemenet mellett is végigfut, és átláthatóan jelzi, mely napokon történt visszaesés az alapértelmezett árra.
 
-A benchmark két fő külső adatkört használ: valós inverteres teljesítmény-idősorokat (5 perces mintavételből képzett órás átlag), valamint ENTSO-E day-ahead árakat (EUR/MWh), amelyek RON/kWh formára konvertálódnak. Az áradatok feldolgozása során területi szűrés (RO zóna), időbélyeg-normalizálás és órás újramintavételezés történik. Hiányos napi árprofil esetén fallback TOU ár kerül használatra, ami biztosítja, hogy részlegesen hiányos forrás mellett is végigfutható maradjon a pipeline, és transzparensen jelzi, mely napoknál történt visszaesés az alapértelmezett árra.
-
-\section{Profilépítés: A 2×2-es mátrix}
-
-A benchmark minden kiválasztott napra négy profilkombinációt képez a termelési és fogyasztási adatokból \cite{Lazzari2023}. Az első kombináció szintetikus PV-t és szintetikus loadot párosít, ez a laboratóriumi ideális eset. A második valós inverter PV-t és szintetikus loadot használ, így elkülöníti a termelési oldal bizonytalanságának hatását. A harmadik kombináció szintetikus PV mellé valós UCI háztartási fogyasztást rendel, a negyedik pedig mindkét oldalon valós adatokat alkalmaz -- ez a teljes valóság forgatókönyve. A döntés mögötti módszertani cél a bemeneti realizmus és a különböző zajforrások hatásának elkülönítése az algoritmusok teljesítményétől.
+\section{Profilépítés: a 2x2-es mátrix}
+A feldolgozott termelési és fogyasztási adatokból a benchmark minden kiválasztott napra négy, egymástól csak a bemeneti realizmusban különböző profilkombinációt épít, hogy a zaj két forrása külön-külön is megfigyelhető legyen. A kiindulópont a teljesen szintetikus eset, amelyben generált PV-termelés és generált fogyasztás találkozik; ez adja a kontrollált, laboratóriumi referenciát. Ebből az egyik irányba a termelési oldalt tesszük valóssá: a valós inverteres PV mellé továbbra is generált fogyasztás társul, így a termelési bizonytalanság hatása önmagában mérhető. A másik irányba a fogyasztási oldalt cseréljük le: a generált PV mellé az UCI adatsorból származó, valós háztartási fogyasztás kerül, ami a fogyasztási zaj hatását izolálja. Végül a negyedik kombináció mindkét oldalon valós adatokat használ, és ez testesíti meg a teljes valóságot, amelyben a megoldónak egyszerre kell kezelnie a termelési és a fogyasztási bizonytalanságot. A négy eset módszertani célja tehát közös: szétválasztani, hogy az algoritmusok teljesítményét mennyiben rontja a termelési, és mennyiben a fogyasztási oldal realizmusa.
 
 \section{Optimalizálási ciklus és futásszám}
-
-Jelölje $D$ a napok számát, $S$ a dataset-változatok számát, $R$ a replikák számát, $A$ az algoritmusok számát, $K$ pedig a futások számát. Ekkor a teljes futásszám:
+Jelölje $D$ a napok, $S$ az adatváltozatok, $R$ a replikák, $A$ az algoritmusok és $K$ a futások számát. Ekkor a teljes futásszám
 \begin{equation}
-N_{eval} = D \cdot S \cdot R \cdot A \cdot K
+N_{eval} = D \cdot S \cdot R \cdot A \cdot K .
 \end{equation}
-A jelenlegi mátrix-konfigurációban $D=16$, $S=4$, $R=1$, $A=5$, $K=2$, ezért összesen \textbf{640 algoritmus-futtatás} történik. Ez a szám elegendő a rangsorok megbízható megállapításához, ugyanakkor végleges statisztikai következtetésekhez bővebb futásszám ajánlott.
+A jelen mátrix-konfigurációban $D=16$, $S=4$, $R=1$, $A=5$ és $K=2$, így összesen 640 algoritmus-futtatás történik.
 
 \section{Kiértékelési mutatók}
-
-A nyers futásszintű adatokból algoritmusonként és adathalmazonként több aggregált mutató képződik: az átlagköltség és szórása, a legjobb költség, az átlagos futási idő, az átlagos relatív rés a profilonkénti legjobbhoz képest, valamint a győzelmek száma és aránya. A gap egy profile-szintű normalizált mutató:
+A nyers, futásszintű adatokból algoritmusonként és adathalmazonként egységes mutatókészlet képződik, amely a teljesítményt több szempontból is megragadja. A megoldás minőségét az átlagköltség és annak szórása, valamint a legjobb elért költség jellemzi, a számítási igényt az átlagos futási idő méri, a versenyképességet pedig a profilonkénti legjobbhoz viszonyított átlagos relatív rés, illetve a győzelmek száma és aránya fejezi ki. A rés azért kulcsfontosságú, mert lehetővé teszi, hogy az algoritmusokat ne csak abszolút költségben, hanem egymáshoz képest is összevethessük: minden profilon ahhoz a legjobb költséghez normalizál, amelyet bármelyik módszer elért. Formálisan
 \begin{equation}
-gap_{i,a}[\%] = \frac{c^{best}_{i,a} - c^{best}_{i,*}}{|c^{best}_{i,*}|+\varepsilon} \cdot 100
+gap_{i,a}[\%] = \frac{c^{best}_{i,a} - c^{best}_{i,*}}{|c^{best}_{i,*}|+\varepsilon} \cdot 100,
 \end{equation}
-ahol $c^{best}_{i,*}$ az adott profil globális legjobb költsége. Ez a mutató lehetővé teszi, hogy az algoritmusok teljesítményét ne csak abszolút értékben, hanem relatív versenyképességük alapján is össze lehessen hasonlítani.
+ahol $i$ a profilt, $a$ az algoritmust jelöli, $c^{best}_{i,*}$ pedig az adott profil globális legjobb költsége. Ez a mutató teszi lehetővé, hogy a különböző nagyságrendű napok eredményei egy közös skálán váljanak összehasonlíthatóvá.
