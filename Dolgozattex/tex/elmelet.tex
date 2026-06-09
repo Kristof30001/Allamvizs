@@ -1,6 +1,6 @@
 %!TEX root = hems_proj.tex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Alkalmazott Algoritmusok}\label{ch:ELM}
+\chapter{Alkalmazott algoritmusok}\label{ch:ELM}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{osszefoglal}
@@ -25,6 +25,25 @@ x'_d = x_d + \mathcal{N}(0,\sigma_m^2)\quad\text{ha } u_d < p_m,\ u_d\sim\mathca
 \end{equation}
 Az elitizmus elve szerint a két legjobb egyed minden generációban változatlanul továbbjut, így a megtalált legjobb megoldás soha nem romolhat el. Ez a három operátor együtt biztosítja a felfedezés és a kiaknázás egyensúlyát: a szelekció a kiaknázást, a mutáció a felfedezést erősíti, a keresztezés pedig a kettő között teremt átmenetet.
 
+A genetikus algoritmus működését az \ref{alg:ga}. algoritmus foglalja össze.
+\begin{algorithm}[H]
+\caption{Genetikus algoritmus (GA)}
+\label{alg:ga}
+\begin{algorithmic}[1]
+\State \textbf{Bemenet:} $N$ populációméret, $G$ iterációszám, $p_m$ mutációs ráta
+\State Kezdeti populáció generálása véletlenszerűen
+\State Fitnesz (célfüggvény) kiértékelése minden egyedre
+\For{$g \gets 1, \dots, G$}
+    \State Elitizmus: a két legjobb egyed átmásolása az új generációba
+    \State Szülők kiválasztása tournament-szelekcióval
+    \State Keresztezés aritmetikai átlagolással és kis zajjal
+    \State Mutáció $p_m$ valószínűséggel (Gauss-perturbáció)
+    \State Az új populáció fitneszének kiértékelése
+\EndFor
+\State \textbf{Kimenet:} a legkisebb költségű megtalált megoldás
+\end{algorithmic}
+\end{algorithm}
+
 \section{Részecskeraj-optimalizálás (PSO)}
 A részecskeraj-optimalizálás eredeti formáját Kennedy és Eberhart vezette be \cite{KennedyEberhartPSO1995}. A módszer egy raj viselkedését modellezi, ahol minden részecske a keresési tér egy lehetséges megoldását jelöli. Minden $i$ részecskét két vektor ír le: a pillanatnyi pozíciója, $X_i$, amely a döntési vektornak felel meg, és a sebessége, $V_i$, amely a következő lépés irányát és nagyságát határozza meg. A raj kollektív tudását két emlékezeti elem hordozza: $P_{best,i}$ az adott részecske eddigi legjobb pozíciója, $G_{best}$ pedig a teljes raj által valaha talált legjobb pozíció.
 
@@ -39,6 +58,31 @@ X_i^{k+1} = X_i^k + V_i^{k+1}.
 \label{eq:pso_position}
 \end{equation}
 Az \eqref{eq:pso_velocity} egyenletben $w$ a tehetetlenségi (inercia-) súly, amely a korábbi mozgásirány megőrzéséért felel, $c_1$ a kognitív együttható, amely a részecskét a saját legjobb pozíciója felé húzza, $c_2$ pedig a szociális együttható, amely a raj globális legjobbja felé irányítja. Az $r_1$ és $r_2$ tagok $[0,1]$ közötti egyenletes eloszlású véletlen számok, amelyek a keresésbe sztochasztikusságot visznek. A módszer legnagyobb erénye a gyorsaság és az egyszerűség, gyenge pontja viszont, hogy a $G_{best}$ erős vonzása miatt hajlamos a korai konvergenciára és egy lokális optimumba ragadhat, ha a keresési tér sok lokális minimumot tartalmaz.
+
+A PSO iterációs logikáját a \ref{alg:pso}. algoritmus mutatja be.
+\begin{algorithm}[H]
+\caption{Részecskeraj-optimalizálás (PSO)}
+\label{alg:pso}
+\begin{algorithmic}[1]
+\State \textbf{Bemenet:} a raj mérete, $G$ iterációszám, $w, c_1, c_2$ együtthatók
+\State Részecskék pozíciójának ($X_i$) és sebességének ($V_i$) inicializálása
+\State Minden $i$-re: $P_{best,i} \gets X_i$, majd $G_{best}$ meghatározása
+\For{$g \gets 1, \dots, G$}
+    \For{minden $i$ részecske}
+        \State $V_i \gets w V_i + c_1 r_1 (P_{best,i} - X_i) + c_2 r_2 (G_{best} - X_i)$
+        \State $X_i \gets X_i + V_i$
+        \State Az új pozíció fitneszének kiértékelése
+        \If{fitnesz$(X_i)$ jobb, mint fitnesz$(P_{best,i})$}
+            \State $P_{best,i} \gets X_i$
+        \EndIf
+        \If{fitnesz$(P_{best,i})$ jobb, mint fitnesz$(G_{best})$}
+            \State $G_{best} \gets P_{best,i}$
+        \EndIf
+    \EndFor
+\EndFor
+\State \textbf{Kimenet:} $G_{best}$
+\end{algorithmic}
+\end{algorithm}
 
 \section{Szürkefarkas-optimalizáló (GWO)}
 A szürkefarkas-optimalizálót Mirjalili és szerzőtársai javasolták \cite{MirjaliliGWO2014}. Az algoritmus a szürkefarkasok társas vadászatát modellezi, és a falka szigorú hierarchiájára épít. A populáció legjobb három egyede tölti be az $\alpha$, a $\beta$ és a $\delta$ szerepet, amelyek a keresés vezérlését adják, míg a többi egyed, az $\omega$ farkasok, ezek irányítását követik. A keresés így nem egyetlen kiemelt megoldás köré szerveződik, hanem három vezető átlagolt iránya köré, ami stabilabbá teszi a haladást.
@@ -60,6 +104,26 @@ formában adódnak. Itt $\vec{a}$ komponensei az iterációk során lineárisan 
 \end{align}
 ahol a $\beta$ és a $\delta$ vezetőkre vonatkozó $\vec{X}_2$ és $\vec{X}_3$ tagok ugyanígy számolódnak. A GWO legfőbb előnye, hogy nagyon kevés hangolandó paramétert igényel, és a lineárisan csökkenő $\vec{a}$ révén automatikusan, fokozatosan tér át a feltáró fázisból a finomhangolóba, ezért már alapbeállítással is erős kiindulási teljesítményt nyújt, különösen szűkebb, jól körülhatárolt keresési térben.
 
+A GWO működését a \ref{alg:gwo}. algoritmus összegzi.
+\begin{algorithm}[H]
+\caption{Szürkefarkas-optimalizáló (GWO)}
+\label{alg:gwo}
+\begin{algorithmic}[1]
+\State \textbf{Bemenet:} a falka mérete, $G$ iterációszám
+\State Farkasok pozíciójának inicializálása véletlenszerűen
+\State Fitnesz kiértékelése; a három legjobb kijelölése: $\alpha, \beta, \delta$
+\For{$g \gets 1, \dots, G$}
+    \State Az $\vec{a}$ paraméter lineáris csökkentése 2-ről 0-ra
+    \For{minden farkas}
+        \State Távolság számítása az $\alpha$, $\beta$ és $\delta$ vezetőktől
+        \State Pozíció frissítése a három vezető átlagolt iránya alapján
+    \EndFor
+    \State Fitnesz kiértékelése; az $\alpha, \beta, \delta$ vezetők frissítése
+\EndFor
+\State \textbf{Kimenet:} az $\alpha$ farkas pozíciója
+\end{algorithmic}
+\end{algorithm}
+
 \section{Hibrid GA--PSO}
 A hibrid GA--PSO eljárás a keresést két, egymást követő fázisra bontja, és a fázishatárt az iterációszám rögzített arányában jelöli ki. Ha a teljes iterációszám $G$, akkor az első, feltáró fázist a PSO végzi
 \begin{equation}
@@ -72,6 +136,20 @@ A két fázis közötti átmenetet az úgynevezett seed injection technika bizto
 \mathbf{x}^{(0)}_i = \mathbf{g}_{best} + \mathcal{N}(0,\sigma^2),\qquad \sigma = 0{,}5 .
 \end{equation}
 Így a GA nem véletlenszerű pontból, hanem a már megtalált jó környezetből indul, ugyanakkor a perturbációk elegendő változatosságot hagynak ahhoz, hogy a keresztezés és a mutáció tovább tudja finomítani a megoldást. A konstrukció célja, hogy a PSO gyors, de korai konvergenciára hajlamos feltérképezését a GA diverzitásmegőrző, lokális csapdákból kivezető finomhangolása egészítse ki, egyesítve a két módszer egymást kiegészítő erősségeit.
+
+A hibrid eljárás lépéseit a \ref{alg:hybrid}. algoritmus foglalja össze.
+\begin{algorithm}[H]
+\caption{Hibrid GA--PSO}
+\label{alg:hybrid}
+\begin{algorithmic}[1]
+\State \textbf{Bemenet:} $N$ populáció, $G$ iterációszám, $\rho = 0{,}6$ fázisarány
+\State $G_{pso} \gets \lfloor \rho \cdot G \rfloor$
+\State A PSO futtatása $G_{pso}$ iteráción át; eredmény: $\mathbf{g}_{best}$
+\State A GA kezdőpopulációja: fele $\mathbf{g}_{best}$, fele $\mathbf{g}_{best} + \mathcal{N}(0,\sigma^2)$
+\State A GA futtatása a maradék $G - G_{pso}$ iteráción át
+\State \textbf{Kimenet:} a GA-fázis legjobb megoldása
+\end{algorithmic}
+\end{algorithm}
 
 \section{A döntési feladat leképezése és a számítási igény}
 A négy módszer ugyanazt a 26 dimenziós döntési vektort optimalizálja: ebből 24 komponens az akkumulátor óránkénti vezérlése, kettő pedig az eltolható eszközök indítási ideje. Mindegyik algoritmus populációalapú, ezért a futási idő első közelítésben a populációméret ($N$), az iterációszám ($G$) és a döntési dimenzió ($d$) szorzatával arányos:
