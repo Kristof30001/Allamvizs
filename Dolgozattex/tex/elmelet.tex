@@ -57,9 +57,7 @@ majd a pozíció ennek megfelelően frissül:
 X_i^{k+1} = X_i^k + V_i^{k+1}.
 \label{eq:pso_position}
 \end{equation}
-Az \eqref{eq:pso_velocity} egyenletben $w$ a tehetetlenségi (inercia-) súly, amely a korábbi mozgásirány megőrzéséért felel, $c_1$ a kognitív együttható, amely a részecskét a saját legjobb pozíciója felé húzza, $c_2$ pedig a szociális együttható, amely a raj globális legjobbja felé irányítja. Az $r_1$ és $r_2$ tagok $[0,1]$ közötti egyenletes eloszlású véletlen számok, amelyek a keresésbe sztochasztikusságot visznek. A módszer legnagyobb erénye a gyorsaság és az egyszerűség, gyenge pontja viszont, hogy a $G_{best}$ erős vonzása miatt hajlamos a korai konvergenciára és egy lokális optimumba ragadhat, ha a keresési tér sok lokális minimumot tartalmaz.
-
-A PSO iterációs logikáját a \ref{alg:pso}. algoritmus mutatja be.
+Az \eqref{eq:pso_velocity} egyenletben $w$ a tehetetlenségi (inercia-) súly, amely a korábbi mozgásirány megőrzéséért felel, $c_1$ a kognitív együttható, amely a részecskét a saját legjobb pozíciója felé húzza, $c_2$ pedig a szociális együttható, amely a raj globális legjobbja felé irányítja. Az $r_1$ és $r_2$ tagok $[0,1]$ közötti egyenletes eloszlású véletlen számok, amelyek a keresésbe sztochasztikusságot visznek. A módszer legnagyobb erénye a gyorsaság és az egyszerűség, gyenge pontja viszont, hogy a $G_{best}$ erős vonzása miatt hajlamos a korai konvergenciára és egy lokális optimumba ragadhat, ha a keresési tér sok lokális minimumot tartalmaz. A PSO iterációs logikáját a \ref{alg:pso}. algoritmus mutatja be.
 \begin{algorithm}[H]
 \caption{Részecskeraj-optimalizálás (PSO)}
 \label{alg:pso}
