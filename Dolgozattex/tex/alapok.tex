@@ -14,20 +14,59 @@ A keresletoldali szabályozásban a genetikus algoritmusok és a részecskeraj-o
 
 A jelen dolgozat által megcélzott kutatási rés a bemeneti adatok realizmusához kapcsolódik. A legtöbb elérhető tanulmány szintetikus vagy erősen egyszerűsített bemeneteken teszteli a rendszereket: a fogyasztási profilokat gyakran generált görbékkel, a fotovoltaikus termelést pedig ideális, zajmentes napi alakzatokkal modellezik. Ez az eljárás hasznos a matematikai sajátosságok izolálására, ám keveset árul el arról, hogyan viselkedik egy algoritmus valós, zajos és aszimmetrikus bemenetek esetén. A dolgozat éppen ezt a hiányt igyekszik betölteni azzal, hogy valós day-ahead árakat, mért PV-termelést és valós háztartási fogyasztást is bevon a kiértékelésbe, és ezeket szisztematikusan szembeállítja a szintetikus megfelelőikkel.
 
-\section{Az optimalizálási feladat és a döntési változók}
+\section{Az optimalizálási feladat}\label{sec:feladat}
 A jelen implementációban a napi optimalizálási feladat 24 órás horizonton fut, és a döntési vektor két fő részből áll. Az első rész az akkumulátor óránkénti teljesítmény-vektora, $p_{batt}(t)$, ahol $t=0,\dots,23$, a második pedig az eltolható eszközök indítási ideje, $s_j$, ahol $j$ az eszköz indexe. A modell így egyszerre tartalmaz folytonos (töltés-kisütés) és diszkrét jellegű (eszközindítás) döntéseket, ami indokolja a metaheurisztikus megközelítést. Az eltolható háztartási eszközök, jellemzően a mosógép és a mosogatógép, olcsóbb idősávra ütemezése a keresletoldali szabályozás egyik leggyakoribb beavatkozása, és a szakirodalomban is bevett modellezési elem \cite{Setlhaolo2014, Logenthiran2012}.
 
 A rendszer alapját az óránkénti energiamérleg adja, amely a hálózatból vételezett teljesítményt a fogyasztás, az eltolható terhelés, a napelemes termelés és az akkumulátor teljesítményének eredőjeként írja le:
 \begin{equation}
 P_{grid}(t) = P_{load}(t) + P_{shift}(t) - P_{pv}(t) + p_{batt}(t),
+\label{eq:energy_balance}
 \end{equation}
 ahol $P_{shift}(t)$ az időzített fogyasztók, például a mosógép vagy a mosogatógép által hozzáadott terhelés. A napi célfüggvény a hálózati energia költségét, az akkumulátor-használat amortizációs költségét és a korlátsértési büntetéseket egyesíti:
 \begin{equation}
 J = \sum_{t=0}^{23} \Bigl[ C_t\bigl(P_{grid}(t),\pi(t)\bigr) + c_{deg}\,\bigl|p_{batt}(t)\bigr| \Bigr] + \lambda_{soc} \cdot \Phi_{soc} + \lambda_{end} \cdot \Phi_{end},
+\label{eq:objective}
 \end{equation}
-ahol $\pi(t)$ az órás ár, $c_{deg}$ az óránként mozgatott energiára eső fajlagos degradációs költség (a modellben $c_{deg}=0{,}15$ RON/kWh), $\Phi_{soc}$ a töltöttségi (SOC) határok megsértésének büntetése, $\Phi_{end}$ pedig a nap végi SOC-visszatérés elmaradásának büntetése. A $c_{deg}\,|p_{batt}(t)|$ tag az akkumulátor kopását árazza be, és így elnyomja a gazdaságilag nem indokolt, gyakori töltés--kisütési mikrociklusokat: a megoldó csak akkor mozgatja a tárolót, ha a vételi és a visszatáplálási árak közötti különbség valóban meghaladja a kopás fajlagos költségét. A megoldás minőségét a napi költség mellett a hálózati terhelés egyenletessége is jellemzi; ez utóbbit a csúcs- és átlagfogyasztás hányadosaként értelmezett mutató, a Peak-to-Average Ratio (PAR) fejezi ki, amelynek csökkentése egyszerre jár költségelőnnyel és a hálózati csúcsok mérséklésével \cite{MohsenianRad2010}.
+ahol az egyes tagok jelentése a következő. A $C_t\bigl(P_{grid}(t),\pi(t)\bigr)$ a $t$-edik órában a hálózati energia költsége, amelyet a \eqref{eq:energy_balance} egyenletből adódó $P_{grid}(t)$ hálózati teljesítmény és a $\pi(t)$ órás villamosenergia-ár határoz meg (pontos, a vétel-visszatáplálás aszimmetriáját kezelő alakját a \ref{sec:korlatok}. szakasz adja meg). A $p_{batt}(t)$ az akkumulátor órás teljesítménye (pozitív érték töltést, negatív kisütést jelöl), $c_{deg}$ pedig az óránként mozgatott energiára eső fajlagos degradációs költség (a modellben $c_{deg}=0{,}15$ RON/kWh). A $\Phi_{soc}$ a töltöttségi szint (State of Charge, SOC) megengedett határainak megsértését bünteti, $\Phi_{end}$ pedig a nap végi SOC-visszatérés elmaradását; a $\lambda_{soc}$ és a $\lambda_{end}$ ezek súlyai. E két büntetőtag pontos alakját és a hozzájuk tartozó korlátokat a \ref{sec:korlatok}. szakasz formalizálja. A $c_{deg}\,|p_{batt}(t)|$ tag az akkumulátor kopását árazza be, és így elnyomja a gazdaságilag nem indokolt, gyakori töltés--kisütési mikrociklusokat: a megoldó csak akkor mozgatja a tárolót, ha a vételi és a visszatáplálási árak közötti különbség valóban meghaladja a kopás fajlagos költségét. A megoldás minőségét a napi költség mellett a hálózati terhelés egyenletessége is jellemzi; ez utóbbit a csúcs- és átlagfogyasztás hányadosaként értelmezett mutató, a Peak-to-Average Ratio (PAR) fejezi ki, amelynek csökkentése egyszerre jár költségelőnnyel és a hálózati csúcsok mérséklésével \cite{MohsenianRad2010}.
 
-\section{Korlátok, büntetések és a vétel-visszatáplálás aszimmetriája}
-A feladat korlátos jellegét elsősorban az akkumulátor fizikai határai adják. A töltöttségi szintnek minden órában a megengedett tartományban kell maradnia, a töltési és kisütési teljesítmény korlátozott, a nap végén pedig elvárás a kiindulási töltöttséghez közeli állapot visszaállítása, hogy a következő nap összehasonlítható feltételekkel induljon. Ezeket a feltételeket a célfüggvény nem kemény korlátként, hanem büntetőtagokon keresztül kezeli: a határok megsértése arányos költségnövekménnyel jár, ami a metaheurisztikák számára folytonos visszajelzést ad a megoldás megvalósíthatóságáról.
+\section{Korlátok, büntetések és a vétel-visszatáplálás aszimmetriája}\label{sec:korlatok}
+A feladat korlátos jellegét elsősorban az akkumulátor fizikai határai adják. A töltöttségi szintnek minden órában a megengedett tartományban kell maradnia, a töltési és kisütési teljesítmény korlátozott, a nap végén pedig elvárás a kiindulási töltöttséghez közeli állapot visszaállítása, hogy a következő nap összehasonlítható feltételekkel induljon.
 
-A modell egy fontos gyakorlati aszimmetriát is figyelembe vesz: a hálózatból vételezett és a hálózatba visszatáplált energia ára eltér. A visszatáplálásért kapott térítés jellemzően alacsonyabb a vételi árnál, ezért a saját termelés helyben történő felhasználása, illetve tárolása rendszerint előnyösebb, mint a hálózatba juttatása. Ez az aszimmetria érdemben befolyásolja az akkumulátor optimális vezérlését, és magyarázza, hogy a megoldó miért törekszik a többlettermelés tárolására ahelyett, hogy azonnal visszatáplálná azt.
+Formálisan jelölje $SOC(t)$ az akkumulátor töltöttségét (kWh-ban) a $t$-edik óra végén, $C_{batt}$ a kapacitást, $\overline{SOC}(t)=SOC(t)/C_{batt}$ pedig a relatív töltöttséget. A töltöttség az órás akkumulátor-teljesítményből frissül:
+\begin{equation}
+SOC(t) = SOC(t-1) + p_{batt}(t), \qquad \overline{SOC}(-1) = SOC_{init}.
+\end{equation}
+Minden $t$ órában teljesülnie kell a töltöttségi és a teljesítménybeli korlátnak:
+\begin{align}
+SOC_{min} \;\le\; \overline{SOC}(t) \;&\le\; SOC_{max}, \label{eq:soc_bound}\\
+-P_{max} \;\le\; p_{batt}(t) \;&\le\; P_{max}, \label{eq:rate_bound}
+\end{align}
+a nap végi állapotra pedig a
+\begin{equation}
+\bigl|\,\overline{SOC}(23) - SOC_{init}\,\bigr| \le \delta \label{eq:end_bound}
+\end{equation}
+feltétel írja elő a kiindulási töltöttséghez való visszatérést. A modellben $SOC_{min}=0{,}2$, $SOC_{max}=0{,}9$, $SOC_{init}=0{,}5$, $P_{max}=3$~kW és $\delta=0{,}1$.
+
+Ezeket a feltételeket a célfüggvény nem kemény korlátként, hanem büntetőtagokon keresztül kezeli: a SOC-határok \eqref{eq:soc_bound} szerinti túllépését négyzetes,
+\begin{equation}
+\Phi_{soc} = \sum_{t=0}^{23} \Bigl( \max\{0,\, SOC_{min}-\overline{SOC}(t)\} + \max\{0,\, \overline{SOC}(t)-SOC_{max}\} \Bigr)^2,
+\end{equation}
+a nap végi \eqref{eq:end_bound} szerinti eltérést pedig lineáris taggal bünteti:
+\begin{equation}
+\Phi_{end} =
+\begin{cases}
+\bigl|\,\overline{SOC}(23) - SOC_{init}\,\bigr|, & \text{ha } \bigl|\,\overline{SOC}(23) - SOC_{init}\,\bigr| > \delta,\\[2pt]
+0, & \text{egyébként.}
+\end{cases}
+\end{equation}
+A büntetősúlyok a modellben $\lambda_{soc}=5000$ és $\lambda_{end}=2000$; ez a folytonos visszajelzés a metaheurisztikák számára a megoldás megvalósíthatóságát jelzi.
+
+A modell egy fontos gyakorlati aszimmetriát is figyelembe vesz: a hálózatból vételezett és a hálózatba visszatáplált energia ára eltér. A visszatáplálásért kapott térítés jellemzően alacsonyabb a vételi árnál, ezért a saját termelés helyben történő felhasználása, illetve tárolása rendszerint előnyösebb, mint a hálózatba juttatása. Ez az aszimmetria érdemben befolyásolja az akkumulátor optimális vezérlését, és magyarázza, hogy a megoldó miért törekszik a többlettermelés tárolására ahelyett, hogy azonnal visszatáplálná azt. Formálisan a hálózati költségtag, vagyis az egyenlet \eqref{eq:objective} $C_t$ tagja, ezt az aszimmetriát a következőképpen kezeli:
+\begin{equation}
+C_t\bigl(P_{grid}(t),\pi(t)\bigr) =
+\begin{cases}
+P_{grid}(t)\,\pi(t), & \text{ha } P_{grid}(t) \ge 0 \quad (\text{hálózati vétel}),\\[2pt]
+\eta\,P_{grid}(t)\,\pi(t), & \text{ha } P_{grid}(t) < 0 \quad (\text{visszatáplálás}),
+\end{cases}
+\end{equation}
+ahol $\eta=0{,}3$ a visszatáplálási szorzó, amely a hálózatba juttatott energia alacsonyabb térítését fejezi ki.

@@ -7,12 +7,12 @@
 A fejezet két szintet fed le: a klasszikus, háromszcenáriós (tél, nyár, borús) eredményeket, valamint a kódalapú 2x2-es benchmarkot, amely a valós és szintetikus bemenetek kombinációival az algoritmusok robusztusságát méri. A szezonális eredmények bemutatása mellett a fejezet a teljes mátrixból levonható következtetéseket és gyakorlati ajánlásokat is összefoglalja.
 \end{osszefoglal}
 
-A kísérleti értékelés két, egymásra épülő szinten zajlik, és a fejezet ezt a két szintet egyetlen gondolatmenetben vezeti végig. Az első szint a klasszikus, háromszcenáriós vizsgálat, amely a téli, a nyári és a borús nap markánsan eltérő körülményei között méri fel, hogyan viselkednek az algoritmusok jól kontrollált, generált bemeneteken. Ez a szint megalapozza az alapvető megfigyeléseket, de nyitva hagy egy kérdést: vajon ugyanez a teljesítmény megmarad-e akkor is, ha a bemenet a valós világ zaját hordozza. Erre a kérdésre válaszol a második szint, a 2x2-es keresztvalidációs mátrix, amely a termelési és a fogyasztási oldal realizmusát külön-külön kapcsolja be, és így a robusztusságot is mérhetővé teszi. A paraméterek rögzítésétől a szezonális eredményeken át a 2x2-es mátrixig haladva a fejezet végül oda jut, hogy nemcsak rangsort, hanem szerepköröket is kijelöl az algoritmusok között.
+A kísérleti értékelés két, egymásra épülő szinten zajlik, és a fejezet ezt a két szintet egyetlen gondolatmenetben vezeti végig. Az első szint a klasszikus, háromszcenáriós vizsgálat, amely a téli, a nyári és a borús nap markánsan eltérő körülményei között méri fel, hogyan viselkednek az algoritmusok jól kontrollált, generált bemeneteken. Ez a szint megalapozza az alapvető megfigyeléseket, de nyitva hagy egy kérdést: vajon ugyanez a teljesítmény megmarad-e akkor is, ha a bemenet a valós világ zaját hordozza. Erre a kérdésre válaszol a második szint, a 2x2-es keresztvalidációs mátrix, amely a termelési és a fogyasztási oldal realizmusát külön-külön kapcsolja be, és így a robusztusságot is mérhetővé teszi. A paraméterek rögzítésétől a szezonális eredményeken át a 2x2-es mátrixig haladva a fejezet végül oda jut, hogy nemcsak egy teljesítménysorrendet állít fel, hanem azt is megmutatja, melyik algoritmus melyik üzemeltetési helyzetben -- a stabilitás, a futási idő vagy a paraméterigény szerinti súlyozás mellett -- bizonyul a legcélszerűbb választásnak.
 
 \section{Paraméterek beállítása}\label{sec:parameterek}
 A kísérletek értelmezhetőségének és reprodukálhatóságának feltétele, hogy a használt paraméterek egyértelműen rögzítve legyenek. A döntési vektor mind a négy algoritmusnál 26 dimenziós, amelyből 24 komponens az akkumulátor óránkénti vezérléséhez, kettő pedig az eltolható eszközök indítási idejéhez tartozik, az időhorizont pedig egységesen 24 óra. A populációalapú keresést a genetikus algoritmusnál két beállítással, 50-es és 100-as populációval is futtattuk, hogy a populációméret hatása mérhető legyen, a többi módszer 50-es populációval dolgozott; az iterációszám minden esetben 150. A reprodukálhatóságot determinisztikus seedelés biztosítja: a szezonális vizsgálat futásai a 42-es bázis-seedből indulnak, a 2x2-es benchmark pedig egy külön, rögzített bázis-seedet ($20\,260\,323$) használ; mindkét esetben a bázis-seedet az ismétlések és a profilok indexével futásonként eltoljuk. A szezonális vizsgálatban algoritmusonként 20, a 2x2-es benchmarkban profilonként és algoritmusonként 5 futás készült.
 
-Az operátorszintű beállításokat a \ref{tab:parameters}. táblázat foglalja össze. A genetikus algoritmus elitizmussal megőrzi a két legjobb egyedet, a szülőket tournament-szelekcióval választja, a keresztezést aritmetikai átlagolással és kis zajjal, a mutációt Gauss-eloszlású perturbációval végzi; ez az operátor- és paraméterválasztás a hasonló energiaoptimalizálási genetikus algoritmusok bevált beállításait követi \cite{Ismail2014}. A részecskeraj-optimalizálás a szakirodalomban elterjedt alapbeállítást követi a tehetetlenségi, a kognitív és a szociális együtthatóra nézve, a szürkefarkas-optimalizáló pedig az $\vec{a}$ vezérlőparamétert lineárisan csökkenti 2-ről 0-ra. A hibrid eljárás az iterációk első 60\%-át a PSO-fázisnak, a maradékot a GA-fázisnak osztja ki.
+Az operátorszintű beállításokat a \ref{tab:parameters}. táblázat foglalja össze. A genetikus algoritmus elitizmussal megőrzi a két legjobb egyedet, a szülőket bajnokság-szelekcióval választja, a keresztezést aritmetikai átlagolással és kis zajjal, a mutációt Gauss-eloszlású perturbációval végzi; ez az operátor- és paraméterválasztás a hasonló energiaoptimalizálási genetikus algoritmusok bevált beállításait követi \cite{Ismail2014}. A részecskeraj-optimalizálás a szakirodalomban elterjedt alapbeállítást követi a tehetetlenségi, a kognitív és a szociális együtthatóra nézve, a szürkefarkas-optimalizáló pedig az $\vec{a}$ vezérlőparamétert lineárisan csökkenti 2-ről 0-ra. A hibrid eljárás az iterációk első 60\%-át a PSO-fázisnak, a maradékot a GA-fázisnak osztja ki.
 
 % MEGJEGYZES: a PSO w, c1, c2 ertekeket es a GA mutacios/keresztezesi aranyt
 % erdemes osszevetni az algorithms.py tenyleges ertekeivel, es ha elternek, itt frissiteni.
@@ -30,7 +30,7 @@ Közös & iterációszám ($G$) & 150 \\
 Közös & bázis-seed & 42 (szezonális); $20\,260\,323$ (2x2) \\
 \midrule
 GA & populáció ($N$) & 50 és 100 \\
-GA & szelekció & tournament \\
+GA & szelekció & bajnokság \\
 GA & elitizmus & 2 legjobb egyed \\
 GA & keresztezés & aritmetikai + zaj \\
 GA & mutáció & Gauss-perturbáció \\
@@ -78,7 +78,7 @@ Büntetés & napvégi SOC-tűrés & 0,1 \\
 \end{table}
 
 \section{Szezonális szcenáriók eredményei}
-A rendszer robusztusságát három, markánsan eltérő szcenárióban vizsgáltuk, mindegyiket 20 ismétléssel. A téli esetet alacsony PV-termelés és magasabb alapfogyasztás jellemzi, ami nagy hálózati függést eredményez. A nyári időszakban ezzel szemben a csúcsban akár 6 kW-os PV-termelés és az alacsonyabb fogyasztás jelentős visszatáplálási potenciált hordoz. A harmadik, viharos vagy borús nap az erősen ingadozó termelése és a magas zaja miatt az akkumulátor dinamikus kezelését teszi szükségessé, ezért az algoritmusok számára stressztesztként szolgál. A nyers eredmények és a futási idők a \texttt{results\_winter}, a \texttt{results\_summer} és a \texttt{results\_cloudy} fájlokban kerültek mentésre.
+A rendszer robusztusságát három, markánsan eltérő szcenárióban vizsgáltuk, mindegyiket 20 ismétléssel. A téli esetet alacsony PV-termelés és magasabb alapfogyasztás jellemzi, ami nagy hálózati függést eredményez. A nyári időszakban ezzel szemben a csúcsban akár 6 kW-os PV-termelés és az alacsonyabb fogyasztás jelentős visszatáplálási potenciált hordoz. A harmadik, viharos vagy borús nap az erősen ingadozó termelése és a magas zaja miatt az akkumulátor dinamikus kezelését teszi szükségessé, ezért az algoritmusok számára stressztesztként szolgál.
 
 A téli szcenárióban az akkumulátor és időzítés nélküli alapvonal átlagosan 42.09 RON/nap, amelyhez képest az algoritmusok eredményeit a \ref{tab:winter_stats}. táblázat foglalja össze. Ebben a szűkös termelési helyzetben a GWO adta a legalacsonyabb átlagköltséget.
 \begin{table}[H]
@@ -138,22 +138,6 @@ Az eredményekből erős szezonális hatás olvasható ki. Nyáron a magas napel
 
 A szezonális vizsgálat világos képet ad arról, hogy a szezonális körülmények mennyire meghatározzák a megtakarítás mértékét, és hogy a változékonyabb napokon a robusztusabb keresési stratégia kerül előnybe. Ezek az eredmények azonban egy fontos korláttal terheltek: mindhárom szcenárió generált, sima bemeneteken alapul, ezért inkább azt mutatják meg, mire képesek az algoritmusok ideális körülmények között, semmint azt, hogyan állják meg a helyüket a gyakorlatban. A valós üzemben a megoldónak egyszerre kell megbirkóznia a termelés időjárásfüggő ingadozásával és a fogyasztás kiszámíthatatlanságával, ezért a következő lépés az, hogy ezt a két zajforrást szisztematikusan, egymástól elkülönítve vezessük be a kísérletbe. Éppen ezt teszi lehetővé a 2x2-es benchmark, amely a szezonális tesztet egy ellenőrzött keresztvalidációvá bővíti.
 
-A hibrid megoldás a keresést PSO- és GA-fázisra bontja; a vezérlő logika egy részlete a \ref{code:hybrid_snippet}. kódrészletben látható.
-\begin{lstlisting}[language=Python, caption={A hibrid algoritmus vezérlő logikája}, label=code:hybrid_snippet]
-class Hybrid(AlgorithmBase):
-    def solve(self):
-        # 1. fazis: PSO (felfedezes)
-        pso_steps = int(self.max_iter * 0.6)
-        pso = PSO(self.func, self.dim, self.lb, self.ub,
-                  self.pop_size, pso_steps)
-        gb, gb_fit = pso.solve()
-
-        # 2. fazis: GA (finomhangolas)
-        ga = GA(self.func, self.dim, self.lb, self.ub,
-                self.pop_size, self.max_iter - pso_steps)
-        # ... tovabbi lepesek
-\end{lstlisting}
-
 A szezonális bemenetek és a hozzájuk tartozó eloszlások szemléltetésére a \ref{fig:winter_day}. ábra a téli nap PV-termelési és fogyasztási profilját, a \ref{fig:winter_box}. ábra pedig a téli költségek eloszlását mutatja a 20 futás alapján.
 \begin{figure}[H]
 \centering
@@ -199,7 +183,7 @@ A valós bemenetek szemléltetésére a \ref{fig:realpv_day}. ábra egy átmenet
 \label{fig:realpv_day}
 \end{figure}
 
-A mátrix 16 kiválasztott napot, öt algoritmust, négy kombinációs esetet és profilonként öt futást fog össze, ami összesen 1600 algoritmus-futtatást jelent. Az aggregált eredményeket a \ref{tab:realpv_synth_summary}. táblázat foglalja össze, amely jól mutatja a minőség és a sebesség közötti kompromisszumot a különböző zajszintek mellett.
+Az aggregált eredményeket a \ref{tab:realpv_synth_summary}. táblázat foglalja össze, amely jól mutatja a minőség és a sebesség közötti kompromisszumot a különböző zajszintek mellett.
 
 \begin{table}[H]
 \centering
