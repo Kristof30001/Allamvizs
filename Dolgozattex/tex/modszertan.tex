@@ -16,12 +16,21 @@ A rendszer moduláris felépítése azt a célt szolgálja, hogy az árkezelés,
 A benchmark két, egymástól független külső adatkörre épül, amelyeket egységes belső formátumra hozunk, mielőtt a profilépítés felhasználná őket. Az első adatkör a termelési oldalt írja le: egy valós, Huawei gyártmányú napelemes inverter öt perces felbontású teljesítmény-idősorait, amelyeket a FusionSolar felügyeleti platformról exportáltunk \cite{HuaweiFusionSolar}, órás átlaggá vonjuk össze, hogy illeszkedjen a 24 órás optimalizálási horizonthoz. A második adatkör az árazási oldal, amelyet az ENTSO-E Transparency Platform day-ahead piacáról veszünk EUR/MWh egységben \cite{ENTSOE}, majd a hazai költségszámításhoz RON/kWh formára konvertálunk. Az áradatok feldolgozása ezután a romániai zónára szűkít, normalizálja az időbélyegeket, és órás felbontásra mintavételezi újra a sorozatot. Mivel a valós forrás időnként hiányos, a rendszer azokra a napokra, ahol az árprofil nem teljes, egy időfüggő tarifán (Time-of-Use) alapuló tartalék árat illeszt be; így a feldolgozási lánc részlegesen hiányos bemenet mellett is végigfut, és átláthatóan jelzi, mely napokon történt visszaesés az alapértelmezett árra.
 
 \section{Profilépítés: a 2x2-es mátrix}
-A feldolgozott termelési és fogyasztási adatokból a benchmark minden kiválasztott napra négy, egymástól csak a bemeneti realizmusban különböző profilkombinációt épít, hogy a zaj két forrása külön-külön is megfigyelhető legyen. A kiindulópont a teljesen szintetikus eset, amelyben generált PV-termelés és generált fogyasztás találkozik; ez adja a kontrollált referenciát. Ebből az egyik irányba a termelési oldalt tesszük valóssá: a valós inverteres PV mellé továbbra is generált fogyasztás társul, így a termelési bizonytalanság hatása önmagában mérhető. A másik irányba a fogyasztási oldalt cseréljük le: a generált PV mellé az UCI adatsorból származó, valós háztartási fogyasztás kerül, ami a fogyasztási zaj hatását izolálja. Végül a negyedik kombináció mindkét oldalon valós adatokat használ, és ez testesíti meg a teljes valóságot, amelyben a megoldónak egyszerre kell kezelnie a termelési és a fogyasztási bizonytalanságot. A négy eset módszertani célja tehát közös: szétválasztani, hogy az algoritmusok teljesítményét mennyiben rontja a termelési, és mennyiben a fogyasztási oldal realizmusa. A \ref{fig:synth_profile}. ábra egy felépített szintetikus napi profilt szemléltet: a generált fogyasztás, a napelemes termelés és a villamosenergia-ár együttes napi lefutását, amelyből a fenti kombinációk egyik bemeneti oldala összeáll.
+A feldolgozott termelési és fogyasztási adatokból a benchmark minden kiválasztott napra négy, egymástól csak a bemeneti realizmusban különböző profilkombinációt épít, hogy a zaj két forrása külön-külön is megfigyelhető legyen. A kiindulópont a teljesen szintetikus eset, amelyben generált PV-termelés és generált fogyasztás találkozik; ez adja a kontrollált referenciát. Ebből az egyik irányba a termelési oldalt tesszük valóssá: a valós inverteres PV mellé továbbra is generált fogyasztás társul, így a termelési bizonytalanság hatása önmagában mérhető. A másik irányba a fogyasztási oldalt cseréljük le: a generált PV mellé az UCI adatsorból származó, valós háztartási fogyasztás kerül, ami a fogyasztási zaj hatását izolálja. Végül a negyedik kombináció mindkét oldalon valós adatokat használ, és ez testesíti meg a teljes valóságot, amelyben a megoldónak egyszerre kell kezelnie a termelési és a fogyasztási bizonytalanságot. A négy eset módszertani célja tehát közös: szétválasztani, hogy az algoritmusok teljesítményét mennyiben rontja a termelési, és mennyiben a fogyasztási oldal realizmusa. A \ref{fig:synth_vs_real}. ábra a mátrix két szélső esetét állítja egymás mellé egy nyári napon: a bal oldali, generált (szintetikus) profilt és a jobb oldali, valós mért profilt. Jól látszik a két véglet közötti különbség: a generált görbék simák, a valós inverteres termelés és a piaci ár ezzel szemben szabálytalan, zajos lefutású. A 2x2-es mátrix éppen e két végpont minden termelés- és fogyasztásoldali kombinációját előállítja.
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.85\textwidth]{ekim2339_proj/generated_day_summer.png}
-\caption{Egy felépített szintetikus napi profil (nyári példa): a generált fogyasztás, a PV-termelés és a villamosenergia-ár.}
-\label{fig:synth_profile}
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\linewidth]{ekim2339_proj/generated_day_summer.png}\\
+{\small (a) Szintetikus (generált) profil}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\linewidth]{ekim2339_proj/outputs/plots/days/2025-06-28_realpv_price.png}\\
+{\small (b) Valós (mért) profil}
+\end{minipage}
+\caption{A 2x2-es mátrix két szélső esete egy nyári napon: (a) generált, sima szintetikus profil; (b) valós, inverteres PV-termelés és ENTSO-E ár. A mátrix e két véglet minden kombinációját előállítja.}
+\label{fig:synth_vs_real}
 \end{figure}
 
 \section{Az optimalizálási ciklus és a kiértékelés mutatói}
